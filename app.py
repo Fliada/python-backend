@@ -20,13 +20,19 @@ def index():
 def login():
     if request.method == 'POST':
         email = request.json.get('email')
-        password = request.json.get('password')
+        password = request.json.get('pass')
 
         # Проверяем наличие пользователя в базе данных
         user = find_user_by_email(email)
         if user.check_password(user.password) == password:
             # Устанавливаем сессию для пользователя
             session['user_id'] = user.id
+            if user.is_superuser:
+                session['role'] = 'admin'
+            elif user.is_staff:
+                session['role'] = 'manager'
+            else:
+                session['role'] = 'user'
             return "Вход выполнен успешно!"
         return "Неправильный логин или пароль"
     return render_template('index.html')

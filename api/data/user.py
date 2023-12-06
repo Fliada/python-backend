@@ -56,6 +56,18 @@ def get_user(_id):
     return line
 
 
+def delete_user(_id):
+    helper.delete("auth_user", ["id"], [_id])
+
+
+def ban_user(_id):
+    helper.update("auth_user", ["id"], [_id], "is_active", "false")
+
+
+def unban_user(_id):
+    helper.update("auth_user", ["id"], [_id], "is_active", "true")
+
+
 def find_user_by_id(_id):
     line = helper.get("auth_user", ["id"], [_id])
     user = auth_user(
