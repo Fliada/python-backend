@@ -24,7 +24,8 @@ def insert_user():
         is_staff = data.get('is_staff')
         is_active = data.get('is_active')
         email = data.get('email')
-        user.create_user(password, is_superuser, first_name, last_name, second_name, is_staff, is_active, email)
+        phone_number = data.get('phone_number')
+        user.create_user(password, is_superuser, first_name, last_name, second_name, is_staff, is_active, email, phone_number)
         return 'Пользователь создан'
     else:
         return "Недостаточно прав"

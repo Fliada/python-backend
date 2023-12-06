@@ -33,7 +33,7 @@ def create_user(password, is_superuser, first_name, last_name, second_name, is_s
               "second_name", "is_staff", "is_active", "date_joined", "email", "phone_number"]
 
     args = [
-        generate_password_hash(password=password, method='sha256'),
+        generate_password_hash(password=password),
         datetime.datetime.now(),
         is_superuser,
         first_name,

@@ -1,27 +1,20 @@
 from flask import Blueprint, session, request
-from api.data import request
-from api.data.request import get_all_requests, convert_requests_to_json, create_request
+from api.data import order
+from api.data.order import get_all_requests, convert_requests_to_json, create_request
 
 order_routes = Blueprint('order_routes', __name__)
 
 
 @order_routes.route('/order/create', methods=['POST'])
 def insert_order():
-    if session['role'] == 'admin':
-        data = request.get_json()
+    data = request.get_json()
 
-        user_id = data.get('user_id')
-        staff_id = data.get('staff_id')
-        address_id = data.get('address_id')
-        comment = data.get('comment')
-        status_id = data.get('status_id')
-        date_creation = data.get('date_creation')
-        date_selected = data.get('date_selected')
-        date_actual = data.get('date_actual')
-        create_request(user_id, staff_id, address_id, comment, status_id, date_creation, date_selected, date_actual)
-        return 'Заказ создан'
-    else:
-        return "Недостаточно прав"
+    user_id = data.get('user_id')
+    address_id = data.get('address_id')
+    comment = data.get('comment')
+    date_selected = data.get('date_selected')
+    create_request(user_id, address_id, comment, date_selected)
+    return 'Заказ создан'
 
 
 # TODO СДЕЛАТЬ РЕАЛИЗАЦИЮ
