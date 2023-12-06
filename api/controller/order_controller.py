@@ -1,11 +1,10 @@
 from flask import Blueprint, session, request
 from api.data import request
-from api.data.request import get_all_requests, convert_requests_to_json
+from api.data.request import get_all_requests, convert_requests_to_json, create_request
 
 order_routes = Blueprint('order_routes', __name__)
 
 
-# TODO СДЕЛАТЬ РЕАЛИЗАЦИЮ
 @order_routes.route('/order/create', methods=['POST'])
 def insert_order():
     if session['role'] == 'admin':
@@ -19,7 +18,7 @@ def insert_order():
         date_creation = data.get('date_creation')
         date_selected = data.get('date_selected')
         date_actual = data.get('date_actual')
-        request.create_request(user_id, staff_id, address_id, comment, status_id, date_creation, date_selected, date_actual)
+        create_request(user_id, staff_id, address_id, comment, status_id, date_creation, date_selected, date_actual)
         return 'Заказ создан'
     else:
         return "Недостаточно прав"
@@ -51,7 +50,6 @@ def repeat_order(order_id):
     return 'Repeat order %d' % order_id
 
 
-# TODO СДЕЛАТЬ РЕАЛИЗАЦИЮ
 @order_routes.route('/order/<int:post_id>', methods=['DELETE'])
 def delete_order(order_id):
     if session['role'] == 'admin':

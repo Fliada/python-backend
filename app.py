@@ -2,6 +2,7 @@ from flask import Flask, render_template, session, request
 
 from api.controller.order_controller import order_routes
 from api.controller.user_controller import user_routes
+from api.controller.material_controller import material_routes
 
 from api.data.user import find_user_by_email
 
@@ -9,6 +10,7 @@ app = Flask(__name__, template_folder='resources/templates')
 app.secret_key = "122333444455555666666777777788888888999999999"
 app.register_blueprint(user_routes)  # Мб добавить сюда url_prefix='/user' а в файле убрать все
 app.register_blueprint(order_routes)  # Мб добавить сюда url_prefix='/order' а в файле убрать все
+app.register_blueprint(material_routes, url_prefix='/material')
 
 
 @app.route('/')

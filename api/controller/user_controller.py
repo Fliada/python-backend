@@ -11,12 +11,6 @@ def get_user(user_id):
     return 'Get user with Id %d' % user_id
 
 
-# TODO СДЕЛАТЬ РЕАЛИЗАЦИЮ (ОН ВООБЩЕ НУЖЕН??)
-@user_routes.route('/user/<int:user_id>', methods=['PUT'])
-def put_user(user_id):
-    return 'Put user with Id %d' % user_id
-
-
 @user_routes.route('/user/create', methods=['POST'])
 def insert_user():
     if session['role'] == 'admin':
