@@ -1,14 +1,13 @@
 from flask import Blueprint, session, request
 from api.data import request
 from api.data.request import get_all_requests, convert_requests_to_json
-from api.data.request import get_all_requests
 
 order_routes = Blueprint('order_routes', __name__)
 
 
 # TODO СДЕЛАТЬ РЕАЛИЗАЦИЮ
 @order_routes.route('/order/create', methods=['POST'])
-def insert_order(order_id):
+def insert_order():
     if session['role'] == 'admin':
         data = request.get_json()
 
