@@ -1,5 +1,6 @@
 from flask import Blueprint, session, request
 from api.data import request
+from api.data.request import get_all_requests, convert_requests_to_json
 
 order_routes = Blueprint('order_routes', __name__)
 
@@ -31,7 +32,8 @@ def get_order(order_id):
 
 
 @order_routes.route('/orders', methods=['GET'])
-def get_order():
+def get_orders():
+    print("Orders")
     all_requests = get_all_requests()
     json_data = convert_requests_to_json(all_requests)
     return json_data

@@ -1,5 +1,4 @@
 import datetime
-import bcrypt
 from werkzeug.security import generate_password_hash, check_password_hash
 from api.db.DBHelper import DBHelper
 

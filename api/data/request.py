@@ -1,4 +1,7 @@
+import datetime
+
 from api.db.DBHelper import DBHelper
+import json
 
 helper = DBHelper()
 
@@ -69,10 +72,15 @@ def get_all_requests():
     for l in lines:
         requests.append(
             Request(
-                line[0], line[1], line[2],
-                line[3], line[4], line[5],
-                line[6], line[7], line[8]
+                lines[0], lines[1], lines[2],
+                lines[3], lines[4], lines[5],
+                lines[6], lines[7], lines[8]
             )
         )
 
+    print(requests)
     return requests
+
+
+def convert_requests_to_json(requests):
+    return json.dumps([req.to_dict() for req in requests], indent=2)
