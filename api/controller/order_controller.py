@@ -1,12 +1,13 @@
 from flask import Blueprint, session, request
 from api.data import request
 from api.data.request import get_all_requests, convert_requests_to_json
+from api.data.request import get_all_requests
 
 order_routes = Blueprint('order_routes', __name__)
 
 
 # TODO СДЕЛАТЬ РЕАЛИЗАЦИЮ
-@order_routes.route('/order/<int:order_id>', methods=['POST'])
+@order_routes.route('/order/create', methods=['POST'])
 def insert_order(order_id):
     if session['role'] == 'admin':
         data = request.get_json()
@@ -41,18 +42,22 @@ def get_orders():
 
 # TODO СДЕЛАТЬ РЕАЛИЗАЦИЮ
 @order_routes.route('/order/<int:post_id>', methods=['PUT'])
-def put_order(post_id):
-    return 'Order %d' % post_id
+def put_order(order_id):
+    return 'Order %d' % order_id
 
 
 # TODO СДЕЛАТЬ РЕАЛИЗАЦИЮ
 @order_routes.route('/order/repeat/<int:post_id>', methods=['POST'])
-def repeat_order(post_id):
-    return 'Repeat order %d' % post_id
+def repeat_order(order_id):
+    return 'Repeat order %d' % order_id
 
 
 # TODO СДЕЛАТЬ РЕАЛИЗАЦИЮ
 @order_routes.route('/order/<int:post_id>', methods=['DELETE'])
-def delete_order(post_id):
-    return 'Order %d' % post_id
+def delete_order(order_id):
+    if session['role'] == 'admin':
+        request.delete_request(order_id)
+        return 'Удалена заявка с Id %d' % order_id
+    else:
+        return "Недостаточно прав"
 

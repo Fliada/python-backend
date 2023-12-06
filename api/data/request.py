@@ -39,11 +39,19 @@ def create_request(user_id, address_id, comment, date_selected):
 
     helper.insert("request", params, args)
 
-    return find_request_by_unique(user_id, date_creation)
+
+def get_request(_id):
+    line = helper.get("request", ["id"], [_id])
+    print(line)
+    return line
 
 
-def find_request_by_unique(user_id, date_creation):
-    line = helper.get("request", ["user_id", "date_creation"], [user_id, date_creation])
+def delete_request(_id):
+    helper.delete("request", ["id"], [_id])
+
+
+def find_request_by_unique(_id, date_creation):
+    line = helper.get("request", ["user_id", "date_creation"], [_id, date_creation])
     request = Request(
         line[0], line[1], line[2],
         line[3], line[4], line[5],

@@ -57,6 +57,7 @@ def unban_user(user_id):
 @user_routes.route('/user/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     if session['role'] == 'admin':
+        user.delete_user(user_id)
         return 'Удален пользователь с Id %d' % user_id
     else:
         return "Недостаточно прав"
