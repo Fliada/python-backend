@@ -1,3 +1,7 @@
+from api.db.DBHelper import DBHelper
+
+helper = DBHelper()
+
 class Address:
     def __init__(self, id_, flat, building, city, street, creator_id):
         self.id_ = id_
@@ -40,7 +44,7 @@ def find_address_by_unique(city, street, building, flat):
 
 
 def get_all_addresses():
-    lines = helper.get("address", ["flat", "building", "city", "street"], [flat, building, city, street])
+    lines = helper.print_info("address")
 
     addresses = []
 

@@ -30,6 +30,13 @@ def get_order(order_id):
     return 'Order %d' % order_id
 
 
+@order_routes.route('/orders', methods=['GET'])
+def get_order():
+    all_requests = get_all_requests()
+    json_data = convert_requests_to_json(all_requests)
+    return json_data
+
+
 # TODO СДЕЛАТЬ РЕАЛИЗАЦИЮ
 @order_routes.route('/order/<int:post_id>', methods=['PUT'])
 def put_order(post_id):

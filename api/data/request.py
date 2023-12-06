@@ -53,9 +53,26 @@ def find_request_by_unique(user_id, date_creation):
 def find_request_by_id(_id):
     line = helper.get("request", ["id"], [_id])[0]
     request = Request(
-        line[0], line[1], line[2], line[3],
-        line[4], line[5], line[6], line[7],
-        line[8]
+        line[0], line[1], line[2],
+        line[3], line[4], line[5],
+        line[6], line[7], line[8]
     )
 
     return request
+
+
+def get_all_requests():
+    lines = helper.print_info("request")
+
+    requests = []
+
+    for l in lines:
+        requests.append(
+            Request(
+                line[0], line[1], line[2],
+                line[3], line[4], line[5],
+                line[6], line[7], line[8]
+            )
+        )
+
+    return requests
