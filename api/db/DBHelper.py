@@ -1,5 +1,6 @@
 import sqlite3
 
+
 class DBHelper:
 
     def __init__(self, db_name="company.db"):
