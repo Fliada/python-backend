@@ -6,7 +6,7 @@ from api.db.DBHelper import DBHelper
 helper = DBHelper()
 
 
-class Auth_user:
+class auth_user:
     def __init__(self, id_, password, last_login, is_superuser, first_name, last_name,
                  second_name, is_staff, is_active, date_joined, email):
         self.id_ = id_
@@ -47,17 +47,21 @@ def create_user(password, is_superuser, first_name, last_name, second_name, is_s
 
     helper.insert("auth_user", params, args)
 
-    line = helper.get("auth_user", ["email"], [email])[0]
-    user = Auth_user(
-        line[0], line[1], line[2], line[3],
-        line[4], line[5], line[6], line[7],
-        line[8], line[9], line[10]
-    )
-
-    return user
+    return find_user_by_email(email)
 
 
 def get_user(_id):
     line = helper.get("auth_user", ["id"], [_id])
     print(line)
     return line
+
+
+def find_user_by_email(email):
+    line = helper.get("auth_user", ["email"], [email])[0]
+    user = auth_user(
+        line[0], line[1], line[2], line[3],
+        line[4], line[5], line[6], line[7],
+        line[8], line[9], line[10]
+    )
+
+    return user
