@@ -66,12 +66,13 @@ class DBHelper:
     def create_auth_user_table(self):
         table_name = "auth_user"
         params = ["id", "password", "last_login", "is_superuser", "first_name", "last_name",
-                  "second_name", "is_staff", "is_active", "date_joined", "email"]
+                  "second_name", "is_staff", "is_active", "date_joined", "email", "phone_number"]
         types = ["INTEGER PRIMARY KEY AUTOINCREMENT", "VARBINARY(256) NOT NULL", "TEXT NOT NULL",
                  "BOOLEAN NOT NULL", "TEXT NOT NULL", "TEXT NOT NULL", "TEXT DEFAULT NULL",
-                 "BOOLEAN NOT NULL", "BOOLEAN NOT NULL", "DATETIME NOT NULL", "TEXT NOT NULL"]
+                 "BOOLEAN NOT NULL", "BOOLEAN NOT NULL", "DATETIME NOT NULL", "TEXT NOT NULL", "TEXT NOT NULL"]
         self.create_table(table_name, params, types, 1, None)
         self.get_unique("auth_user", "unique_user_email", ["email"])
+        self.get_unique("auth_user", "unique_user_phone", ["phone_number"])
 
     def create_address_table(self):
         table_name = "address"

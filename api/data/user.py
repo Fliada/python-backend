@@ -8,7 +8,7 @@ helper = DBHelper()
 
 class auth_user:
     def __init__(self, id_, password, last_login, is_superuser, first_name, last_name,
-                 second_name, is_staff, is_active, date_joined, email):
+                 second_name, is_staff, is_active, date_joined, email, phone_number):
         self.id_ = id_
         self.password = password
         self.last_login = last_login
@@ -20,17 +20,18 @@ class auth_user:
         self.is_active = is_active
         self.date_joined = date_joined
         self.email = email
+        self.phone_number = phone_number
 
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+        self.password_hash = generate_password_hash(password=password, method='sha256')
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
 
-def create_user(password, is_superuser, first_name, last_name, second_name, is_staff, is_active, email):
+def create_user(password, is_superuser, first_name, last_name, second_name, is_staff, is_active, email, phone_number):
     params = ["password", "last_login", "is_superuser", "first_name", "last_name",
-              "second_name", "is_staff", "is_active", "date_joined", "email"]
+              "second_name", "is_staff", "is_active", "date_joined", "email", "phone_number"]
 
     args = [
         generate_password_hash(password=password, method='sha256'),
@@ -42,7 +43,8 @@ def create_user(password, is_superuser, first_name, last_name, second_name, is_s
         is_staff,
         is_active,
         datetime.datetime.now(),
-        email
+        email,
+        phone_number
     ]
 
     helper.insert("auth_user", params, args)
@@ -84,7 +86,7 @@ def find_user_by_email(email):
     user = auth_user(
         line[0], line[1], line[2], line[3],
         line[4], line[5], line[6], line[7],
-        line[8], line[9], line[10]
+        line[8], line[9], line[10], line[11]
     )
 
     return user
