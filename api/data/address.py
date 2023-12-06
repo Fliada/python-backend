@@ -1,27 +1,30 @@
 class Address:
-    def __init__(self, id_, flat, building, city, street, is_archieve, creator_id):
+    def __init__(self, id_, flat, building, city, street, creator_id):
         self.id_ = id_
         self.flat = flat
         self.building = building
         self.city = city
         self.street = street
-        self.is_archieve = is_archieve
+        self.is_archieve = None
         self.creator_id = creator_id
 
+    def set_archieve(self, is_archieve):
+        self.is_archieve = is_archieve
 
-def create_address(flat, building, city, street, is_archieve, creator_id):
-    params = ["flat", "building", "city", "street", "is_archieve", "creator_id"]
+
+def create_address(flat, building, city, street, creator_id):
+    params = ["flat", "building", "city", "street", "creator_id"]
 
     args = [
         flat,
         building,
         city,
         street,
-        is_archieve,
+        False,
         creator_id
     ]
 
-    helper.insert("auth_user", params, args)
+    helper.insert("address", params, args)
 
     return find_address_by_unique(city, street, building, flat)
 
@@ -30,7 +33,57 @@ def find_address_by_unique(city, street, building, flat):
     line = helper.get("address", ["flat", "building", "city", "street"], [flat, building, city, street])
     address = Address(
         line[0], line[1], line[2], line[3],
-        line[4], line[5], line[6], line[7]
+        line[4], line[5], line[6]
     )
 
     return address
+
+
+def get_all_addresses():
+    lines = helper.get("address", ["flat", "building", "city", "street"], [flat, building, city, street])
+
+    addresses = []
+
+    for l in lines:
+        addresses.append(
+            Address(
+                l[0], l[1], l[2], l[3],
+                l[4], l[5], l[6]
+            )
+        )
+
+    return addresses
+
+
+def get_all_addresses_by_id(_id):
+    lines = helper.get("address", ["flat", "building", "city", "street"], [flat, building, city, street])
+
+    addresses = []
+
+    for l in lines:
+        if l[6] == _id:
+            addresses.append(
+                Address(
+                    l[0], l[1], l[2], l[3],
+                    l[4], l[5], l[6]
+                )
+            )
+
+    return addresses
+
+
+def get_archive_addresses_by_id(_id):
+    lines = helper.get("address", ["flat", "building", "city", "street"], [flat, building, city, street])
+
+    addresses = []
+
+    for l in lines:
+        if l[6] == _id and l[5] == 'TRUE':
+            addresses.append(
+                Address(
+                    l[0], l[1], l[2], l[3],
+                    l[4], l[5], l[6]
+                )
+            )
+
+    return addresses

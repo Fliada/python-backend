@@ -82,12 +82,14 @@ class DBHelper:
             ["creator_id", "auth_user", "id"]
         ])
 
+        self.get_unique("address", "unique_address", ["flat", "building", "city", "street"])
+
     def create_request_table(self):
         table_name = "request"
         params = ["id", "user_id", "staff_id", "address_id", "comment", "status_id",
                   "date_creation", "date_selected", "date_actual"]
         types = ["INTEGER PRIMARY KEY AUTOINCREMENT", "INTEGER", "INTEGER DEFAULT NULL", "INTEGER", "TEXT", "INTEGER",
-                 "DATETIME", "DATETIME", "DATETIME"]
+                 "DATETIME", "DATETIME", "DATETIME DEFAULT NULL"]
         self.create_table(table_name, params, types, 1, [
             ["user_id", "auth_user", "id"],
             ["staff_id", "auth_user", "id"],

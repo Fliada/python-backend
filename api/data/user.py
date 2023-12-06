@@ -71,11 +71,11 @@ def unban_user(_id):
 
 
 def find_user_by_id(_id):
-    line = helper.get("auth_user", ["id"], [_id])
+    line = helper.get("auth_user", ["id"], [_id])[0]
     user = auth_user(
         line[0], line[1], line[2], line[3],
         line[4], line[5], line[6], line[7],
-        line[8], line[9], line[10]
+        line[8], line[9], line[10], line[11]
     )
 
     return user
