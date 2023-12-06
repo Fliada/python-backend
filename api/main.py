@@ -1,5 +1,7 @@
 from app import app
+from api.db.DBHelper import DBHelper
 
+helper = DBHelper()
 
 # TODO СДЕЛАТЬ РЕАЛИЗАЦИЮ
 @app.route('/user', methods=['GET'])

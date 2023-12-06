@@ -7,7 +7,6 @@ app = Flask(__name__, template_folder='resources/templates')
 app.register_blueprint(user)  # Мб добавить сюда url_prefix='/user' а в файле убрать все
 app.register_blueprint(order)  # Мб добавить сюда url_prefix='/order' а в файле убрать все
 
-
 @app.route('/')
 def index():
     return render_template('index.html')
