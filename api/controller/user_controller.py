@@ -1,36 +1,34 @@
-from flask import Blueprint
-from flask import Flask, request, session
+from fastapi import FastAPI, Request, APIRouter
 from api.data import user
+from api.model.User import UserCreate
+
+user_routes = APIRouter()
 
 
-user_routes = Blueprint('user_routes', __name__)
-
-
-@user_routes.route('/user/<int:user_id>', methods=['GET'])
+@user_routes.get('/user/<int:user_id>')
 def get_user(user_id):
     return 'Get user with Id %d' % user_id
 
 
-@user_routes.route('/user/create', methods=['POST'])
-def insert_user():
-    if session['role'] == 'admin':
-        data = request.get_json()
+@user_routes.post('/user/create')
+def insert_user(userRequest: UserCreate):
+    print((userRequest.password, userRequest.is_superuser,
+                     userRequest.first_name, userRequest.last_name,
+                     userRequest.second_name, userRequest.is_staff,
+                     userRequest.is_active, userRequest.email,
+                     userRequest.phone_number))
 
-        password = data.get('password')
-        is_superuser = data.get('is_superuser')
-        first_name = data.get('first_name')
-        last_name = data.get('last_name')
-        second_name = data.get('second_name')
-        is_staff = data.get('is_staff')
-        is_active = data.get('is_active')
-        email = data.get('email')
-        user.create_user(password, is_superuser, first_name, last_name, second_name, is_staff, is_active, email)
-        return 'Пользователь создан'
-    else:
-        return "Недостаточно прав"
+    # ТУТ ТОЖЕ САМОЕ ЧТО И С ДРУГИМ ЗАПРОСОМ В APP.PY ДАННЫЕ ПРИХОДЯТ И ПРАВИЛЬНО ОБРАБАТЫВАЮТСЯ, НО НЕ ДОБАВЛЯЮТСЯ, ЭТО УЖЕ НЕ СЕЙЧАС ДЕЛАЕТСЯ
+    # ШАБЛОН ТАКЖЕ В MODEL.USER.PY
+    user.create_user(userRequest.password, userRequest.is_superuser,
+                     userRequest.first_name, userRequest.last_name,
+                     userRequest.second_name, userRequest.is_staff,
+                     userRequest.is_active, userRequest.email,
+                     userRequest.phone_number)
+    return 'Пользователь создан'
 
 
-@user_routes.route('/user/<int:user_id>', methods=['POST', 'PUT'])
+@user_routes.post('/user/<int:user_id>')
 def ban_user(user_id):
     if (session['role'] == 'admin') | (session['role'] == 'manager'):
         user.ban_user(user_id)
@@ -39,7 +37,7 @@ def ban_user(user_id):
         return "Недостаточно прав"
 
 
-@user_routes.route('/user/<int:user_id>', methods=['POST', 'PUT'])
+@user_routes.post('/user/<int:user_id>')
 def unban_user(user_id):
     if (session['role'] == 'admin') | (session['role'] == 'manager'):
         user.unban_user(user_id)
@@ -48,11 +46,10 @@ def unban_user(user_id):
         return "Недостаточно прав"
 
 
-@user_routes.route('/user/<int:user_id>', methods=['DELETE'])
+@user_routes.delete('/user/<int:user_id>')
 def delete_user(user_id):
     if session['role'] == 'admin':
         user.delete_user(user_id)
         return 'Удален пользователь с Id %d' % user_id
     else:
         return "Недостаточно прав"
-

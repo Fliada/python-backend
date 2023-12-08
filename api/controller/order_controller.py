@@ -1,11 +1,13 @@
-from flask import Blueprint, session, request
+from fastapi import APIRouter
+
 from api.data import request
 from api.data.request import get_all_requests, convert_requests_to_json, create_request
 
-order_routes = Blueprint('order_routes', __name__)
+order_routes = APIRouter()
 
 
-@order_routes.route('/order/create', methods=['POST'])
+# TODO ОФОРМИТЬ РЕАЛИЗАЦИЮ ЧЕРЕЗ MODEL ОПЯТЬ НАВЕРНОЕ
+@order_routes.post('/order/create')
 def insert_order():
     if session['role'] == 'admin':
         data = request.get_json()
@@ -25,12 +27,12 @@ def insert_order():
 
 
 # TODO СДЕЛАТЬ РЕАЛИЗАЦИЮ
-@order_routes.route('/order/<int:order_id>', methods=['GET'])
+@order_routes.get('/order/<int:order_id>')
 def get_order(order_id):
     return 'Order %d' % order_id
 
 
-@order_routes.route('/orders', methods=['GET'])
+@order_routes.get('/orders')
 def get_orders():
     print("Orders")
     all_requests = get_all_requests()
@@ -39,18 +41,18 @@ def get_orders():
 
 
 # TODO СДЕЛАТЬ РЕАЛИЗАЦИЮ
-@order_routes.route('/order/<int:post_id>', methods=['PUT'])
+@order_routes.put('/order/<int:post_id>')
 def put_order(order_id):
     return 'Order %d' % order_id
 
 
 # TODO СДЕЛАТЬ РЕАЛИЗАЦИЮ
-@order_routes.route('/order/repeat/<int:post_id>', methods=['POST'])
+@order_routes.post('/order/repeat/<int:post_id>')
 def repeat_order(order_id):
     return 'Repeat order %d' % order_id
 
 
-@order_routes.route('/order/<int:post_id>', methods=['DELETE'])
+@order_routes.delete('/order/<int:post_id>')
 def delete_order(order_id):
     if session['role'] == 'admin':
         request.delete_request(order_id)

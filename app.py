@@ -1,50 +1,45 @@
-from flask import Flask, render_template, session, request
+from fastapi import FastAPI, Request
+from fastapi.responses import FileResponse
+from pydantic import BaseModel
 
-from api.controller.order_controller import order_routes
-from api.controller.user_controller import user_routes
-from api.controller.material_controller import material_routes
-
+from api.controller import user_controller, order_controller, material_controller
 from api.data.user import find_user_by_email
+from api.model.User import UserLogin
 
-app = Flask(__name__, template_folder='resources/templates')
+app = FastAPI()
 app.secret_key = "122333444455555666666777777788888888999999999"
-app.register_blueprint(user_routes)  # Мб добавить сюда url_prefix='/user' а в файле убрать все
-app.register_blueprint(order_routes)  # Мб добавить сюда url_prefix='/order' а в файле убрать все
-app.register_blueprint(material_routes, url_prefix='/material')
+app.include_router(user_controller.user_routes)
+app.include_router(order_controller.order_routes)
 
 
-@app.route('/')
+@app.get('/', response_class=FileResponse)
 def index():
-    return render_template('index.html')
+    return 'resources/templates/index.html'
 
 
-@app.route('/authorization', methods=['POST', 'GET'])
-def login():
-    if request.method == 'POST':
-        email = request.json.get('email')
-        password = request.json.get('pass')
-
-        # Проверяем наличие пользователя в базе данных
-        user = find_user_by_email(email)
-        if user.check_password(user.password) == password:
-            # Устанавливаем сессию для пользователя
-            session['user_id'] = user.id
-            if user.is_superuser:
-                session['role'] = 'admin'
-            elif user.is_staff:
-                session['role'] = 'manager'
-            else:
-                session['role'] = 'user'
-            return "Вход выполнен успешно!"
-        return "Неправильный логин или пароль"
-    return render_template('index.html')
-
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    return render_template('index.html')
+@app.post('/authorization')
+def login(user: UserLogin):
+    email = user.email
+    password = user.password
+    print(email)
+    print(password)
+    # TODO СВЕРХУ ДАННЫЕ ПРИХОДЯТ, А В МЕТОДЕ СНИЗУ ОШИБКА list index out of range ИЗ HELPER.GET ВСЯКОЕ ТАКОЕ
+    result = find_user_by_email(email)
+    # if user.check_password(user.password) == password:
+    #     # Устанавливаем сессию для пользователя
+    #     session['user_id'] = user.id
+    #     if user.is_superuser:
+    #         session['role'] = 'admin'
+    #     elif user.is_staff:
+    #         session['role'] = 'manager'
+    #     else:
+    #         session['role'] = 'user'
+    #     return "Вход выполнен успешно!"
+    return {"email": email, "password": password}
 
 
-if __name__ == "__main__":
-    app.run()
+# @app.post('/logout')
+# def logout():
+#     session.clear()
+#     return render_template('index.html')
+
