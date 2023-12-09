@@ -1,28 +1,21 @@
-from flask import Blueprint, session, request
-from api.data import request
+from fastapi import APIRouter
+
+from api.model.Material import MaterialCreate
 from api.data.material import create_material, delete_material
 
-material_routes = Blueprint('material_routes', __name__)
+material_routes = APIRouter()
 
 
-@material_routes.route('/material/create', methods=['POST'])
-def insert_material():
-    if session['role'] == 'admin':
-        data = request.get_json()
-
-        category_id = data.get('category_id')
-        name = data.get('name')
-        units = data.get('units')
-        create_material(category_id, name, units)
-        return "Материал создан"
-    else:
-        return "Недостаточно прав"
+@material_routes.post('/material/create')
+def insert_material(materialRequest: MaterialCreate):
+    category_id = materialRequest.category_id
+    name = materialRequest.name
+    units = materialRequest.units
+    create_material(category_id, name, units)
+    return "Материал создан"
 
 
-@material_routes.route('/material/<int:post_id>', methods=['DELETE'])
+@material_routes.delete('/material/<int:post_id>')
 def delete_material(order_id):
-    if session['role'] == 'admin':
-        delete_material(order_id)
-        return 'Удалена заявка с Id %d' % order_id
-    else:
-        return "Недостаточно прав"
+    delete_material(order_id)
+    return 'Удалена заявка с Id %d' % order_id

@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse
-from pydantic import BaseModel
 
 from api.controller import user_controller, order_controller, material_controller
 from api.data.user import find_user_by_email
@@ -10,6 +9,7 @@ app = FastAPI()
 app.secret_key = "122333444455555666666777777788888888999999999"
 app.include_router(user_controller.user_routes)
 app.include_router(order_controller.order_routes)
+app.include_router(material_controller.material_routes)
 
 
 @app.get('/', response_class=FileResponse)
@@ -43,3 +43,7 @@ def login(user: UserLogin):
 #     session.clear()
 #     return render_template('index.html')
 
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, port=8080)

@@ -12,44 +12,41 @@ def get_user(user_id):
 
 @user_routes.post('/user/create')
 def insert_user(userRequest: UserCreate):
-    print((userRequest.password, userRequest.is_superuser,
-                     userRequest.first_name, userRequest.last_name,
-                     userRequest.second_name, userRequest.is_staff,
-                     userRequest.is_active, userRequest.email,
-                     userRequest.phone_number))
+    print(userRequest.password, userRequest.is_superuser,
+          userRequest.first_name, userRequest.last_name,
+          userRequest.second_name, userRequest.is_staff,
+          userRequest.is_active, userRequest.email,
+          userRequest.phone_number)
 
-    # ТУТ ТОЖЕ САМОЕ ЧТО И С ДРУГИМ ЗАПРОСОМ В APP.PY ДАННЫЕ ПРИХОДЯТ И ПРАВИЛЬНО ОБРАБАТЫВАЮТСЯ, НО НЕ ДОБАВЛЯЮТСЯ, ЭТО УЖЕ НЕ СЕЙЧАС ДЕЛАЕТСЯ
-    # ШАБЛОН ТАКЖЕ В MODEL.USER.PY
-    user.create_user(userRequest.password, userRequest.is_superuser,
-                     userRequest.first_name, userRequest.last_name,
-                     userRequest.second_name, userRequest.is_staff,
-                     userRequest.is_active, userRequest.email,
-                     userRequest.phone_number)
+    # РАБОТАЕТ
+    # ШАБЛОН В MODEL.USER.PY
+    password = userRequest.password
+    is_superuser = userRequest.is_superuser
+    first_name = userRequest.first_name
+    last_name = userRequest.last_name
+    second_name = userRequest.second_name
+    is_staff = userRequest.is_staff
+    is_active = userRequest.is_active
+    email = userRequest.email
+    phone_number = userRequest.phone_number
+
+    user.create_user(password, is_superuser, first_name, last_name, second_name, is_staff, is_active, email, phone_number)
     return 'Пользователь создан'
 
 
 @user_routes.post('/user/<int:user_id>')
 def ban_user(user_id):
-    if (session['role'] == 'admin') | (session['role'] == 'manager'):
-        user.ban_user(user_id)
-        return 'Забанен пользователь с Id %d' % user_id
-    else:
-        return "Недостаточно прав"
+    user.ban_user(user_id)
+    return 'Забанен пользователь с Id %d' % user_id
 
 
 @user_routes.post('/user/<int:user_id>')
 def unban_user(user_id):
-    if (session['role'] == 'admin') | (session['role'] == 'manager'):
-        user.unban_user(user_id)
-        return 'Разбанен пользователь с Id %d' % user_id
-    else:
-        return "Недостаточно прав"
+    user.unban_user(user_id)
+    return 'Разбанен пользователь с Id %d' % user_id
 
 
 @user_routes.delete('/user/<int:user_id>')
 def delete_user(user_id):
-    if session['role'] == 'admin':
-        user.delete_user(user_id)
-        return 'Удален пользователь с Id %d' % user_id
-    else:
-        return "Недостаточно прав"
+    user.delete_user(user_id)
+    return 'Удален пользователь с Id %d' % user_id
