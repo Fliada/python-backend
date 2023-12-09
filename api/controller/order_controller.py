@@ -8,7 +8,7 @@ order_routes = APIRouter()
 
 
 # РАБОТАЕТ
-@order_routes.post('/order/create')
+@order_routes.post('/create')
 def insert_order(orderRequest: OrderCreate):
 
     user_id = orderRequest.user_id
@@ -20,12 +20,12 @@ def insert_order(orderRequest: OrderCreate):
 
 
 # TODO СДЕЛАТЬ РЕАЛИЗАЦИЮ
-@order_routes.get('/order/<int:order_id>')
+@order_routes.get('/<int:order_id>')
 def get_order(order_id):
     return 'Order %d' % order_id
 
 
-@order_routes.get('/orders')
+@order_routes.get('/all')
 def get_orders():
     print("Orders")
     all_requests = get_all_requests()
@@ -34,18 +34,18 @@ def get_orders():
 
 
 # TODO СДЕЛАТЬ РЕАЛИЗАЦИЮ
-@order_routes.put('/order/<int:order_id>')
+@order_routes.put('/<int:order_id>')
 def put_order(order_id):
     return 'Order %d' % order_id
 
 
 # TODO СДЕЛАТЬ РЕАЛИЗАЦИЮ
-@order_routes.post('/order/repeat/<int:order_id>')
+@order_routes.post('/repeat/<int:order_id>')
 def repeat_order(order_id):
     return 'Repeat order %d' % order_id
 
 
-@order_routes.delete('/order/<int:order_id>')
+@order_routes.delete('/<int:order_id>')
 def delete_order(order_id):
     order.delete_request(order_id)
 

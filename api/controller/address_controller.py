@@ -6,7 +6,7 @@ from api.model.Address import AddressCreate
 address_routes = APIRouter()
 
 
-@address_routes.post('/address/create')
+@address_routes.post('/create')
 def insert_address(addressRequest: AddressCreate):
     flat = addressRequest.flat
     building = addressRequest.building

@@ -1,15 +1,16 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse
 
-from api.controller import user_controller, order_controller, material_controller
+from api.controller import user_controller, order_controller, material_controller, address_controller
 from api.data.user import find_user_by_email
 from api.model.User import UserLogin
 
 app = FastAPI()
 app.secret_key = "122333444455555666666777777788888888999999999"
-app.include_router(user_controller.user_routes)
-app.include_router(order_controller.order_routes)
-app.include_router(material_controller.material_routes)
+app.include_router(user_controller.user_routes, prefix="/user", tags=["user"])
+app.include_router(order_controller.order_routes, prefix="/order", tags=["order"])
+app.include_router(material_controller.material_routes, prefix="/materials", tags=["materials"])
+app.include_router(address_controller.address_routes, prefix="/address", tags=["address"])
 
 
 @app.get('/', response_class=FileResponse)

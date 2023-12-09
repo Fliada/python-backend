@@ -6,7 +6,7 @@ from api.data.material import create_material, delete_material
 material_routes = APIRouter()
 
 
-@material_routes.post('/material/create')
+@material_routes.post('/create')
 def insert_material(materialRequest: MaterialCreate):
     category_id = materialRequest.category_id
     name = materialRequest.name
@@ -15,7 +15,7 @@ def insert_material(materialRequest: MaterialCreate):
     return "Материал создан"
 
 
-@material_routes.delete('/material/<int:post_id>')
+@material_routes.delete('/<int:post_id>')
 def delete_material(order_id):
     delete_material(order_id)
     return 'Удалена заявка с Id %d' % order_id
