@@ -91,3 +91,7 @@ def get_archive_addresses_by_id(_id):
             )
 
     return addresses
+
+
+def delete_address(city, street, building, flat):
+    helper.delete("request", ["flat", "building", "city", "street"], [city, street, building, flat])
