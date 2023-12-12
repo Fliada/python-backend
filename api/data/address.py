@@ -2,6 +2,7 @@ from api.db.DBHelper import DBHelper
 
 helper = DBHelper()
 
+
 class Address:
     def __init__(self, id_, flat, building, city, street, creator_id):
         self.id_ = id_
