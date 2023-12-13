@@ -17,8 +17,7 @@ def check_jwt(jwt_token):
         return False
 
 
-@jwt_routes.post('/generate')
-def generate_jwt(email, password):
+def generate_jwt(email):
     for payload in tokens:
         if payload['email'] == email:
             return "User already has token"

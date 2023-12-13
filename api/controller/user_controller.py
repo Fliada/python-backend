@@ -3,9 +3,10 @@ from fastapi import FastAPI, Request, APIRouter
 from flask import request
 from api.data import user
 from api.model.User import UserCreate
+from fastapi import HTTPException
+from api.controller import jwt_controller
 
 user_routes = APIRouter()
-
 
 
 @user_routes.get('/{user_id}')
@@ -37,13 +38,16 @@ def insert_user(userRequest: UserCreate):
     return 'Пользователь создан'
 
 
-@user_routes.post('/check')
+@user_routes.post('/try_login')
 def check_pass():
     data = request.get_json()
     usr = user.find_user_by_email(data.get('email'))
     if usr is None:
-        False
-    return usr.check_password(data.get('pass'))
+        raise HTTPException(status_code=404, detail="User not found")
+    elif not usr.check_password(data.get('pass')):
+        raise HTTPException(status_code=400, detail="Invalid password")
+    else:
+        return {"jwt": jwt_controller.generate(data.get('email'))}
 
 
 @user_routes.post('/{user_id}')
