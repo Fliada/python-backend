@@ -20,11 +20,10 @@ def insert_order(orderRequest: OrderCreate):
     return 'Заказ создан'
 
 
-# TODO СДЕЛАТЬ РЕАЛИЗАЦИЮ
-@order_routes.get('/<int:order_id>')
-def get_order(order_id):
+@order_routes.get('/{order_id}')
+def get_order(order_id: str):
     result_order = order.get_request(order_id)
-    print('Возвращен заказ с номером %d' % order_id)
+    print('Возвращен заказ с номером %s' % order_id)
     return json.dumps(result_order)
 
 
@@ -37,20 +36,20 @@ def get_orders():
 
 
 # Оставить если нужно будет что-то поменять в заявке
-@order_routes.put('/<int:order_id>')
-def put_order(order_id):
+@order_routes.put('/{order_id}')
+def put_order(order_id: str):
     return 'Order %d' % order_id
 
 
 # При повторе заявки дата тоже должна повторяться?
-@order_routes.post('/repeat/<int:order_id>')
-def repeat_order(order_id):
+@order_routes.post('/repeat/{order_id}')
+def repeat_order(order_id: str):
     new_order = order.find_request_by_id(order_id)
     order.create_request(new_order.user_id, new_order.address_id, new_order.comment, new_order.date_selected)
-    return 'Repeat order %d' % order_id
+    return 'Repeat order %s' % order_id
 
 
-@order_routes.delete('/<int:order_id>')
-def delete_order(order_id):
+@order_routes.delete('/{order_id}')
+def delete_order(order_id: str):
     order.delete_request(order_id)
 

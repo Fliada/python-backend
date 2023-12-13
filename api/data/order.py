@@ -80,9 +80,9 @@ def get_all_requests():
     for l in lines:
         requests.append(
             Request(
-                lines[0], lines[1], lines[2],
-                lines[3], lines[4], lines[5],
-                lines[6], lines[7], lines[8]
+                l[0], l[1], l[2],
+                l[3], l[4], l[5],
+                l[6], l[7], l[8]
             )
         )
 

@@ -1,9 +1,17 @@
+from dataclasses import dataclass
+
 from api.db.DBHelper import DBHelper
 
 helper = DBHelper()
 
 
+@dataclass
 class Material:
+    id_: int
+    category_id: int
+    name: str
+    units: str
+
     def __init__(self, id_, category_id, name, units):
         self.id_ = id_
         self.category_id = category_id
@@ -25,9 +33,9 @@ def create_material(category_id, name, units):
 
 def get_material(_id):
     line = helper.get("material", ["id"], [_id])
-    material = Material(
-        line[0], line[1], line[2], line[3]
-    )
+    print(line)
+    material = Material(*line[0])
+
     return material
 
 
