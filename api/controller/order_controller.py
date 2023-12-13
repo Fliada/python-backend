@@ -4,6 +4,7 @@ from fastapi import APIRouter
 
 from api.data import order
 from api.model.Order import OrderCreate
+from api import JSONHelper
 
 order_routes = APIRouter()
 
@@ -20,19 +21,19 @@ def insert_order(orderRequest: OrderCreate):
     return 'Заказ создан'
 
 
+@order_routes.get('/all')
+def get_orders():
+    print("Orders")
+    all_requests = order.get_all_requests()
+    json_data = order.toJSON(all_requests)
+    return json_data
+
+
 @order_routes.get('/{order_id}')
 def get_order(order_id: str):
     result_order = order.get_request(order_id)
     print('Возвращен заказ с номером %s' % order_id)
     return json.dumps(result_order)
-
-
-@order_routes.get('/all')
-def get_orders():
-    print("Orders")
-    all_requests = order.get_all_requests()
-    json_data = order.convert_requests_to_json(all_requests)
-    return json_data
 
 
 # Оставить если нужно будет что-то поменять в заявке

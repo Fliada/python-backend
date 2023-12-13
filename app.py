@@ -5,7 +5,7 @@ from api.controller import user_controller, order_controller, material_controlle
 from api.data.user import find_user_by_email
 from api.model.User import UserLogin
 
-app = FastAPI(openapi_prefix="/api")
+app = FastAPI(openapi_prefix="/")
 app.secret_key = "122333444455555666666777777788888888999999999"
 app.include_router(user_controller.user_routes, prefix="/user", tags=["User"])
 app.include_router(order_controller.order_routes, prefix="/order", tags=["Order"])

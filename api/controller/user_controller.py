@@ -1,13 +1,16 @@
+import requests
 from fastapi import FastAPI, Request, APIRouter
+from flask import request
 from api.data import user
 from api.model.User import UserCreate
 
 user_routes = APIRouter()
 
 
+
 @user_routes.get('/{user_id}')
 def get_user(user_id: str):
-    return 'Get user with Id %s' % user_id
+    return user.get_user(user_id)
 
 
 @user_routes.post('/create')
@@ -32,6 +35,15 @@ def insert_user(userRequest: UserCreate):
 
     user.create_user(password, is_superuser, first_name, last_name, second_name, is_staff, is_active, email, phone_number)
     return 'Пользователь создан'
+
+
+@user_routes.post('/check')
+def check_pass():
+    data = request.get_json()
+    usr = user.find_user_by_email(data.get('email'))
+    if usr is None:
+        False
+    return usr.check_password(data.get('pass'))
 
 
 @user_routes.post('/{user_id}')

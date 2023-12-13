@@ -22,7 +22,7 @@ class auth_user:
         self.phone_number = phone_number
 
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password=password, method='sha256')
+        self.password = generate_password_hash(password=password, method='sha256')
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
@@ -54,7 +54,10 @@ def create_user(password, is_superuser, first_name, last_name, second_name, is_s
 def get_user(_id):
     line = helper.get("auth_user", ["id"], [_id])
     print(line)
-    return line
+
+    usr = auth_user(*line[0])
+
+    return usr
 
 
 def delete_user(_id):

@@ -250,7 +250,14 @@ class DBHelper:
         new_get = f"SELECT * FROM {table_name}"
         cursor = self.conn.execute(new_get)
 
-        # print("Выполнилось")
+        print(new_get)
+
+        return [row for row in cursor]
+
+    def any_request(self, new_request):
+        cursor = self.conn.execute(new_request)
+
+        print(new_request)
 
         return [row for row in cursor]
 
@@ -261,7 +268,7 @@ class DBHelper:
         query += column_args[len(column_args) - 1] + " = '" + args[len(column_args) - 1] + "'"
 
         new_get = f"SELECT * FROM {table_name} WHERE {query}"
-        # print(new_get)
+        print(new_get)
 
         cursor = self.conn.execute(new_get)
 

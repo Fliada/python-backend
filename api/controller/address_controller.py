@@ -1,3 +1,24 @@
+from flask import Blueprint, session, request
+from api.data import order
+from api.data.address import create_address
+from api.data.material import create_material, delete_material
+
+address_routes = Blueprint('address_routes', __name__)
+
+
+@address_routes.route('/address/create', methods=['POST'])
+def insert_address():
+    data = request.get_json()
+
+    #"id", "flat", "building", "city", "street", "is_archieve", "creator_id"
+
+    flat = data.get('flat')
+    building = data.get('building')
+    city = data.get('city')
+    street = data.get('street')
+    creator_id = data.get('creator_id')
+    create_address(flat, building, city, street, creator_id)
+    return 'Адрес создан'
 from fastapi import APIRouter
 
 from api.data import address

@@ -6,6 +6,7 @@ import json
 helper = DBHelper()
 
 
+
 class Request:
     def __init__(self, id_, user_id, staff_id, address_id, comment, status_id,
                  date_creation, date_selected, date_actual):
@@ -74,6 +75,7 @@ def find_request_by_id(_id):
 
 def get_all_requests():
     lines = helper.print_info("request")
+    print(lines)
 
     requests = []
 
@@ -92,3 +94,8 @@ def get_all_requests():
 
 def convert_requests_to_json(requests):
     return json.dumps([req.to_dict() for req in requests], indent=2)
+
+
+def toJSON(self):
+    return json.dumps(self, default=lambda o: o.__dict__,
+                      sort_keys=True, indent=4)

@@ -18,6 +18,14 @@ def insert_material(materialRequest: MaterialCreate):
     return "Материал создан"
 
 
+@material_routes.get('/all')
+def get_materials():
+    print("Materials")
+    all_materials = material.get_all_materials()
+    json_data = material.toJSON(all_materials)
+    return json_data
+
+
 @material_routes.get('/{material_id}')
 def get_category(material_id: str):
     result_material = material.get_material(material_id)

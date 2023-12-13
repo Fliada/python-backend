@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from api.db.DBHelper import DBHelper
 
 helper = DBHelper()
+import json
 
 
 @dataclass
@@ -34,10 +35,32 @@ def create_material(category_id, name, units):
 def get_material(_id):
     line = helper.get("material", ["id"], [_id])
     print(line)
-    material = Material(*line[0])
+    mat = Material(*line[0])
 
-    return material
+    return mat
+
+
+def get_all_materials():
+    req = f"SELECT m.id, c.name, m.name, m.units " \
+          f"FROM material m JOIN category c ON m.category_id = c.id"
+    lines = helper.any_request(req)
+    print(lines)
+
+    materials = []
+
+    for l in lines:
+        materials.append(
+            Material(*l)
+        )
+
+    print(materials)
+    return materials
 
 
 def delete_material(_id):
     helper.delete("material", ["id"], [_id])
+
+
+def toJSON(self):
+    return json.dumps(self, default=lambda o: o.__dict__,
+                      sort_keys=True, indent=4)
