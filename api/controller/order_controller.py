@@ -3,7 +3,7 @@ import json
 from fastapi import APIRouter
 
 from api.data import order
-from api.model.Order import OrderCreate
+from api.model.Order import OrderCreate, OrderStatus
 from api import JSONHelper
 
 order_routes = APIRouter()
@@ -40,6 +40,12 @@ def get_order(order_id: str):
 @order_routes.put('/{order_id}')
 def put_order(order_id: str):
     return 'Order %d' % order_id
+
+
+@order_routes.put('/status/{order_id}')
+def set_status_order(order_id: str, orderStatus: OrderStatus):
+    order.set_status_request(order_id, orderStatus.status_id)
+    return 'Статус у заказа %d был изменен' % order_id
 
 
 # При повторе заявки дата тоже должна повторяться?

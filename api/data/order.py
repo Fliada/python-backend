@@ -6,7 +6,6 @@ import json
 helper = DBHelper()
 
 
-
 class Request:
     def __init__(self, id_, user_id, staff_id, address_id, comment, status_id,
                  date_creation, date_selected, date_actual):
@@ -43,6 +42,12 @@ def create_request(user_id, address_id, comment, date_selected):
 
 def get_request(_id):
     line = helper.get("request", ["id"], [_id])
+    print(line)
+    return line
+
+
+def set_status_request(_id, status):
+    line = helper.update("request", ["id"], [_id], "status", change=status)
     print(line)
     return line
 

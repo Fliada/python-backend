@@ -8,3 +8,8 @@ class OrderCreate(BaseModel):
     address_id: int
     comment: str
     date_selected: datetime
+
+
+class OrderStatus(BaseModel):
+    status_id: int
+
