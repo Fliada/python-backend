@@ -46,8 +46,8 @@ def get_request(_id):
     return line
 
 
-def set_status_request(_id, status):
-    line = helper.update("request", ["id"], [_id], "status", change=status)
+def update_request(_id, item, name):
+    line = helper.update("request", ["id"], [_id],  column_change=item, change=name)
     print(line)
     return line
 

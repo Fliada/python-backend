@@ -3,7 +3,7 @@ from dataclasses import asdict
 
 from fastapi import APIRouter
 
-from api.model.Material import MaterialCreate
+from api.model.Material import MaterialCreate, MaterialUpdate
 from api.data import material
 
 material_routes = APIRouter()
@@ -16,6 +16,17 @@ def insert_material(materialRequest: MaterialCreate):
     units = materialRequest.units
     material.create_material(category_id, name, units)
     return "Материал создан"
+
+
+@material_routes.post('/update/{material_id}')
+def update_material(material_id: str, materialUpdate: MaterialUpdate):
+    if materialUpdate.name is not None:
+        material.update_material(material_id, "name", materialUpdate.name)
+    if materialUpdate.units is not None:
+        material.update_material(material_id, "units", materialUpdate.units)
+    if materialUpdate.category_id is not None:
+        material.update_material(material_id, "category_id", materialUpdate.category_id)
+    return "Материал обновлен"
 
 
 @material_routes.get('/all')

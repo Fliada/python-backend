@@ -57,6 +57,12 @@ def get_all_materials():
     return materials
 
 
+def update_material(_id, item, name):
+    line = helper.update("material", ["id"], [_id], column_change=item, change=name)
+    print(line)
+    return line
+
+
 def delete_material(_id):
     helper.delete("material", ["id"], [_id])
 
