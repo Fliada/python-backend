@@ -21,3 +21,19 @@ def get_category(_id):
     category = Category(*line[0])
 
     return category
+
+
+def get_all_categories():
+    req = f"SELECT *" \
+          f"FROM category"
+    lines = helper.any_request(req)
+
+    categories = []
+
+    for l in lines:
+        categories.append(
+            l
+        )
+
+    print(categories)
+    return categories
