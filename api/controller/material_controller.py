@@ -2,6 +2,7 @@ import json
 from dataclasses import asdict
 
 from fastapi import APIRouter
+from starlette.responses import JSONResponse
 
 from api.model.Material import MaterialCreate, MaterialUpdate
 from api.data import material
@@ -34,15 +35,15 @@ def get_materials():
     print("Materials")
     all_materials = material.get_all_materials()
     json_data = material.toJSON(all_materials)
-    return json_data
+    return JSONResponse(content=[asdict(mat) for mat in all_materials])
 
 
 @material_routes.get('/{material_id}')
 def get_category(material_id: str):
     result_material = material.get_material(material_id)
     print('Возвращена категория с id %s' % material_id)
-    print(json.dumps(asdict(result_material), ensure_ascii=False))
-    return json.dumps(asdict(result_material), ensure_ascii=False)
+    print(json.dumps(asdict(result_material), ensure_ascii=False, indent=4))
+    return JSONResponse(content=asdict(result_material))
 
 
 @material_routes.delete('/{material_id}')
