@@ -1,4 +1,3 @@
-import json
 from dataclasses import asdict
 
 from fastapi import APIRouter
@@ -32,17 +31,13 @@ def update_material(material_id: str, materialUpdate: MaterialUpdate):
 
 @material_routes.get('/all')
 def get_materials():
-    print("Materials")
     all_materials = material.get_all_materials()
-    json_data = material.toJSON(all_materials)
     return JSONResponse(content=[asdict(mat) for mat in all_materials])
 
 
 @material_routes.get('/{material_id}')
 def get_category(material_id: str):
     result_material = material.get_material(material_id)
-    print('Возвращена категория с id %s' % material_id)
-    print(json.dumps(asdict(result_material), ensure_ascii=False, indent=4))
     return JSONResponse(content=asdict(result_material))
 
 
