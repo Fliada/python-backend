@@ -6,8 +6,8 @@ helper = DBHelper()
 
 
 class auth_user:
-    def __init__(self, id_, password, last_login, is_superuser, first_name, last_name,
-                 second_name, is_staff, is_active, date_joined, email, phone_number):
+    def __init__(self, id_: int, password: str, last_login: str, is_superuser: bool, first_name: str, last_name: str,
+                 second_name: str, is_staff: bool, is_active: bool, date_joined: str, email: str, phone_number: str):
         self.id_ = id_
         self.password = password
         self.last_login = last_login
@@ -46,9 +46,11 @@ def create_user(password, is_superuser, first_name, last_name, second_name, is_s
         phone_number
     ]
 
-    helper.insert("auth_user", params, args)
+    flag = helper.insert("auth_user", params, args)
+    if flag:
+        return find_user_by_email(email)
 
-    return find_user_by_email(email)
+    return flag
 
 
 def get_user(_id):

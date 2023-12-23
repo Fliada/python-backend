@@ -35,7 +35,7 @@ def get_current_user(token: str = Depends(get_bearer_token)):
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        token_bytes = token.credentials.encode('utf-8')
+        token_bytes = token.credentials
         payload = jwt_manager.verify_token(token_bytes)
         if payload is None:
             raise credentials_exception
@@ -51,8 +51,8 @@ def get_user(user_id: str, current_user: dict = Depends(get_current_user)):
 
     if usr:
         return {"sub": usr.id_,
-                "is_superuser": current_user.get("is_superuser", False),
-                "is_stuff": current_user.get("is_stuff", False)}
+                "is_superuser": usr.is_superuser,
+                "is_stuff": usr.is_staff}
     else:
         return {"message": "User not found"}
 
@@ -62,7 +62,7 @@ def insert_user(
         userRequest: UserCreate,
         current_user: dict = Depends(get_current_user)
 ):
-    if not current_user.get('is_superuser'):
+    if current_user.get('is_superuser') == "False":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can create users")
 
     # РАБОТАЕТ
@@ -77,9 +77,11 @@ def insert_user(
     email = userRequest.email
     phone_number = userRequest.phone_number
 
-    user.create_user(password, is_superuser, first_name, last_name, second_name, is_staff, is_active, email,
+    flag = user.create_user(password, is_superuser, first_name, last_name, second_name, is_staff, is_active, email,
                      phone_number)
-    return 'Пользователь создан'
+    if flag:
+        return 'Пользователь успешно создан'
+    return HTTPException(status_code=400, detail="Пользователь НЕ создан")
 
 
 # Функция для проверки пароля и создания токена

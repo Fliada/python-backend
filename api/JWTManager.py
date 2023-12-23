@@ -15,10 +15,10 @@ class JWTManager:
             'iat': now,
             'exp': now + timedelta(minutes=expiration_minutes)
         }
-        token = jwt.encode(payload, self.secret_key, algorithm='HS256').encode('utf-8')
+        token = jwt.encode(payload, self.secret_key, algorithm='HS256')
         return token
 
-    def verify_token(self, token: bytes):
+    def verify_token(self, token):
         # Метод проверки подписи и срока действия JWT
         try:
             payload = jwt.decode(token, self.secret_key, algorithms=['HS256'])
