@@ -22,10 +22,10 @@ class auth_user:
         self.phone_number = phone_number
 
     def set_password(self, password):
-        self.password = generate_password_hash(password=password, method='sha256')
+        self.password = generate_password_hash(password=password)
 
     def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+        return check_password_hash(self.password, password)
 
 
 def create_user(password, is_superuser, first_name, last_name, second_name, is_staff, is_active, email, phone_number):
@@ -33,7 +33,7 @@ def create_user(password, is_superuser, first_name, last_name, second_name, is_s
               "second_name", "is_staff", "is_active", "date_joined", "email", "phone_number"]
 
     args = [
-        generate_password_hash(password=password, method='sha256'),
+        generate_password_hash(password=password),
         datetime.datetime.now(),
         is_superuser,
         first_name,
@@ -55,8 +55,10 @@ def get_user(_id):
     line = helper.get("auth_user", ["id"], [_id])
     print(line)
 
-    usr = auth_user(*line[0])
+    if len(line) == 0:
+        return None
 
+    usr = auth_user(*line[0])
     return usr
 
 

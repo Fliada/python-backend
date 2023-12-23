@@ -1,26 +1,69 @@
-import requests
-from fastapi import FastAPI, Request, APIRouter
-from flask import request
+from fastapi import APIRouter, Depends, HTTPException, status
 from api.data import user
-from api.model.User import UserCreate
+from api.model.User import UserCreate, UserLogin
 from fastapi import HTTPException
-from api.controller import jwt_controller
+from api.JWTManager import JWTManager
+import configparser
+from fastapi.security import OAuth2PasswordBearer, HTTPBearer
+import os
+
+# Получаем абсолютный путь к текущему скрипту
+current_dir = os.path.dirname(os.path.abspath(__file__ + "\..\.."))
+
+# Собираем путь к файлу config.ini
+
+config_file = 'config.ini'
+config_path = os.path.join(current_dir, 'configs', config_file)
+
+config = configparser.ConfigParser()
+config.read(config_path)
+
+secret_key = config['JWT']['SECRET_KEY']
 
 user_routes = APIRouter()
+jwt_manager = JWTManager(secret_key)
+
+# Создаем экземпляр OAuth2PasswordBearer для извлечения токена из запроса
+get_bearer_token = HTTPBearer(auto_error=False)
 
 
+# Декоратор для проверки наличия и валидности токена
+def get_current_user(token: str = Depends(get_bearer_token)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        token_bytes = token.credentials.encode('utf-8')
+        payload = jwt_manager.verify_token(token_bytes)
+        if payload is None:
+            raise credentials_exception
+        return payload
+    except Exception:
+        raise credentials_exception
+
+
+# Пример маршрута, доступного всем аутентифицированным пользователям
 @user_routes.get('/{user_id}')
-def get_user(user_id: str):
-    return user.get_user(user_id)
+def get_user(user_id: str, current_user: dict = Depends(get_current_user)):
+    usr = user.get_user(user_id)
+
+    if usr:
+        return {"sub": usr.id_,
+                "is_superuser": current_user.get("is_superuser", False),
+                "is_stuff": current_user.get("is_stuff", False)}
+    else:
+        return {"message": "User not found"}
 
 
 @user_routes.post('/create')
-def insert_user(userRequest: UserCreate):
-    print(userRequest.password, userRequest.is_superuser,
-          userRequest.first_name, userRequest.last_name,
-          userRequest.second_name, userRequest.is_staff,
-          userRequest.is_active, userRequest.email,
-          userRequest.phone_number)
+def insert_user(
+        userRequest: UserCreate,
+        current_user: dict = Depends(get_current_user)
+):
+    if not current_user.get('is_superuser'):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can create users")
 
     # РАБОТАЕТ
     # ШАБЛОН В MODEL.USER.PY
@@ -34,20 +77,26 @@ def insert_user(userRequest: UserCreate):
     email = userRequest.email
     phone_number = userRequest.phone_number
 
-    user.create_user(password, is_superuser, first_name, last_name, second_name, is_staff, is_active, email, phone_number)
+    user.create_user(password, is_superuser, first_name, last_name, second_name, is_staff, is_active, email,
+                     phone_number)
     return 'Пользователь создан'
 
 
-@user_routes.post('/try_login')
-def check_pass():
-    data = request.get_json()
-    usr = user.find_user_by_email(data.get('email'))
-    if usr is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    elif not usr.check_password(data.get('pass')):
-        raise HTTPException(status_code=400, detail="Invalid password")
+# Функция для проверки пароля и создания токена
+def check_pass_and_create_token(email: str, password: str):
+    # Ваша логика для проверки пароля
+    usr = user.find_user_by_email(email)
+    if usr and usr.check_password(password):
+        # Создание токена с использованием метода create_token из JWTManager
+        token = jwt_manager.create_token(usr.id_, usr.is_superuser, usr.is_staff)
+        return {"access_token": token, "token_type": "bearer"}
     else:
-        return {"jwt": jwt_controller.generate(data.get('email'))}
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+
+
+@user_routes.post('/auth')
+def get_token(userRequest: UserLogin):
+    return check_pass_and_create_token(userRequest.email, userRequest.password)
 
 
 @user_routes.post('/{user_id}')
