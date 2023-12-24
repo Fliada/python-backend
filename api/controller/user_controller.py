@@ -6,9 +6,10 @@ from api.JWTManager import JWTManager
 import configparser
 from fastapi.security import OAuth2PasswordBearer, HTTPBearer
 import os
+from api.roles import ROLES
 
 # Получаем абсолютный путь к текущему скрипту
-current_dir = os.path.dirname(os.path.abspath(__file__ + "\..\.."))
+current_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 # Собираем путь к файлу config.ini
 
@@ -62,23 +63,27 @@ def insert_user(
         userRequest: UserCreate,
         current_user: dict = Depends(get_current_user)
 ):
-    if current_user.get('is_superuser') == "False":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can create users")
+    if not current_user.get(ROLES.STAFF.value):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can create users")
+
+    is_superuser = userRequest.is_superuser
+    is_staff = userRequest.is_staff
+
+    if (is_superuser or is_staff) and not current_user.get(ROLES.ADMIN.value):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can create admins and staff")
 
     # РАБОТАЕТ
     # ШАБЛОН В MODEL.USER.PY
     password = userRequest.password
-    is_superuser = userRequest.is_superuser
     first_name = userRequest.first_name
     last_name = userRequest.last_name
     second_name = userRequest.second_name
-    is_staff = userRequest.is_staff
     is_active = userRequest.is_active
     email = userRequest.email
     phone_number = userRequest.phone_number
 
     flag = user.create_user(password, is_superuser, first_name, last_name, second_name, is_staff, is_active, email,
-                     phone_number)
+                            phone_number)
     if flag:
         return 'Пользователь успешно создан'
     return HTTPException(status_code=400, detail="Пользователь НЕ создан")
@@ -88,7 +93,7 @@ def insert_user(
 def check_pass_and_create_token(email: str, password: str):
     # Ваша логика для проверки пароля
     usr = user.find_user_by_email(email)
-    if usr and usr.check_password(password):
+    if usr and usr.check_password(password) and usr.is_active:
         # Создание токена с использованием метода create_token из JWTManager
         token = jwt_manager.create_token(usr.id_, usr.is_superuser, usr.is_staff)
         return {"access_token": token, "token_type": "bearer"}
@@ -102,18 +107,36 @@ def get_token(userRequest: UserLogin):
 
 
 @user_routes.post('/{user_id}')
-def ban_user(user_id: str):
+def ban_user(
+        user_id: str,
+        current_user: dict = Depends(get_current_user)
+):
+    if not current_user.get(ROLES.STAFF.value):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can ban users")
+
     user.ban_user(user_id)
     return 'Забанен пользователь с Id %s' % user_id
 
 
 @user_routes.post('/{user_id}')
-def unban_user(user_id: str):
+def unban_user(
+        user_id: str,
+        current_user: dict = Depends(get_current_user)
+):
+    if not current_user.get(ROLES.STAFF):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can unbun users")
+
     user.unban_user(user_id)
     return 'Разбанен пользователь с Id %s' % user_id
 
 
 @user_routes.delete('/{user_id}')
-def delete_user(user_id: str):
+def delete_user(
+        user_id: str,
+        current_user: dict = Depends(get_current_user)
+):
+    if current_user.get(ROLES.STAFF) == "False":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can delete users")
+
     user.delete_user(user_id)
     return 'Удален пользователь с Id %s' % user_id

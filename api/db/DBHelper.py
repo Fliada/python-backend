@@ -1,5 +1,5 @@
 import sqlite3
-
+from api.status import OrderStatus
 
 class DBHelper:
 
@@ -8,6 +8,7 @@ class DBHelper:
         self.conn = sqlite3.connect(db_name, check_same_thread=False)
         self.create_database()
         self.insert_categories()
+        self.insert_statuses()
 
     def create_database(self):
         self.create_all_tables()
@@ -62,6 +63,15 @@ class DBHelper:
         for i in range(len(list)):
             for j in range(len(list1[i])):
                 self.insert('material', ["category_id", "name", "units"], [i + 1, list1[i][j], units[i][j]])
+
+
+    def insert_statuses(self):
+
+        statuses = OrderStatus
+
+        for item in statuses:
+            self.insert('status', ["id", "name"], [item.value, item.name])
+
 
     def create_auth_user_table(self):
         table_name = "auth_user"
