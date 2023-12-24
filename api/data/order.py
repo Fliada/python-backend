@@ -109,7 +109,7 @@ def get_user_request(user_id):
 
 
 def update_request(_id, item, name):
-    line = helper.update("request", ["id"], [_id],  column_change=item, change=name)
+    line = helper.update("request", "id", _id,  column_change=item, change=name)
     print(line)
     return line
 

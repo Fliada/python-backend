@@ -20,3 +20,4 @@ class OrderUpdate(BaseModel):
     address: Optional[str] = None
     comment: Optional[str] = None
     date_selected: Optional[datetime] = None
+    status_id: Optional[int] = None

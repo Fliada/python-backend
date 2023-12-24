@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from werkzeug.security import generate_password_hash, check_password_hash
 from api.db.DBHelper import DBHelper
 from datetime import datetime
@@ -6,7 +8,21 @@ from api.DateHelper import format_date
 helper = DBHelper()
 
 
+@dataclass
 class auth_user:
+    id_: int
+    password: str
+    last_login: str
+    is_superuser: bool
+    first_name: str
+    last_name: str
+    second_name: str
+    is_staff: bool
+    is_active: bool
+    date_joined: datetime
+    email: str
+    phone_number: str
+
     def __init__(self, id_: int, password: str, last_login: str, is_superuser: bool, first_name: str, last_name: str,
                  second_name: str, is_staff: bool, is_active: bool, date_joined: str, email: str, phone_number: str):
         self.id_ = id_
@@ -69,6 +85,19 @@ def get_user(_id):
 
     usr = auth_user(*line[0])
     return usr
+
+
+def get_users():
+    lines = helper.print_info("auth_user")
+
+    users = []
+
+    for l in lines:
+        users.append(
+            auth_user(*l)
+        )
+
+    return users
 
 
 def delete_user(_id):

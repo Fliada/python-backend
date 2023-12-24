@@ -83,7 +83,7 @@ def put_order(
         order_id: str,
         current_user: dict = Depends(get_current_user)
 ):
-    return 'Order %d' % order_id
+    return 'Order %s' % order_id
 
 
 @order_routes.put('/update/{order_id}')
@@ -95,14 +95,16 @@ def update_order(
     if not current_user.get(ROLES.STAFF.value):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can update the order")
 
-    order.update_request(order_id, orderUpdate.status_id)
-    if orderUpdate.address_id is not None:
+    if orderUpdate.address is not None:
         order.update_request(order_id, "address", orderUpdate.address)
     if orderUpdate.comment is not None:
         order.update_request(order_id, "comment", orderUpdate.comment)
     if orderUpdate.date_selected is not None:
         order.update_request(order_id, "date_selected", orderUpdate.date_selected)
-    return 'Заказ %d был изменен' % order_id
+    if orderUpdate.status_id is not None:
+        order.update_request(order_id, "status_id", orderUpdate.status_id)
+
+    return 'Заказ %s был изменен' % order_id
 
 
 # При повторе заявки дата тоже должна повторяться?
@@ -129,7 +131,7 @@ def repeat_order(
     for mat in materials:
         request_materials.create_request_material(_id, mat.material_id, mat.count)
 
-    return 'Repeat order %s' % order_id
+    return f'Repeat order {order_id}'
 
 
 @order_routes.delete('/{order_id}')

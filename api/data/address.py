@@ -1,16 +1,27 @@
+from dataclasses import dataclass
+
 from api.db.DBHelper import DBHelper
 
 helper = DBHelper()
 
 
+@dataclass
 class Address:
-    def __init__(self, id_, flat, building, city, street, creator_id):
+    id_: int
+    flat: int
+    building: int
+    city: str
+    street: str
+    is_archieve: bool
+    creator_id: int
+
+    def __init__(self, id_, flat, building, city, street, is_archieve, creator_id):
         self.id_ = id_
         self.flat = flat
         self.building = building
         self.city = city
         self.street = street
-        self.is_archieve = None
+        self.is_archieve = is_archieve
         self.creator_id = creator_id
 
     def set_archieve(self, is_archieve):
@@ -18,7 +29,7 @@ class Address:
 
 
 def create_address(flat, building, city, street, creator_id):
-    params = ["flat", "building", "city", "street", "creator_id"]
+    params = ["flat", "building", "city", "street", "is_archieve", "creator_id"]
 
     args = [
         flat,
@@ -35,14 +46,17 @@ def create_address(flat, building, city, street, creator_id):
 
 
 def find_address_by_unique(city, street, building, flat):
-    line = helper.get("address", ["flat", "building", "city", "street"], [flat, building, city, street])
-    address = Address(
-        line[0], line[1], line[2], line[3],
-        line[4], line[5], line[6]
-    )
+    line = helper.get("address", ["flat", "building", "city", "street"], [flat, building, city, street])[0]
+    print(*line)
+    address = Address(*line)
 
     return address
 
+def find_address_by_id(_id):
+    line = helper.get("address", ["id"], [_id])[0]
+    addr = Address(*line)
+
+    return addr
 
 def get_all_addresses():
     lines = helper.print_info("address")
@@ -51,48 +65,45 @@ def get_all_addresses():
 
     for l in lines:
         addresses.append(
-            Address(
-                l[0], l[1], l[2], l[3],
-                l[4], l[5], l[6]
-            )
+            Address(*l)
         )
 
     return addresses
 
 
 def get_all_addresses_by_id(_id):
-    lines = helper.get("address", ["flat", "building", "city", "street"], [flat, building, city, street])
+    lines = helper.get("address", ["creator_id"], [_id])
 
     addresses = []
 
     for l in lines:
         if l[6] == _id:
             addresses.append(
-                Address(
-                    l[0], l[1], l[2], l[3],
-                    l[4], l[5], l[6]
-                )
+                Address(*l)
             )
 
     return addresses
 
 
 def get_archive_addresses_by_id(_id):
-    lines = helper.get("address", ["flat", "building", "city", "street"], [flat, building, city, street])
+    lines = helper.get("address", ["creator_id"], [_id])
 
     addresses = []
 
     for l in lines:
-        if l[6] == _id and l[5] == 'TRUE':
+        if l[6] == _id and l[5] == 'True':
             addresses.append(
-                Address(
-                    l[0], l[1], l[2], l[3],
-                    l[4], l[5], l[6]
-                )
+                Address(*l)
             )
 
     return addresses
 
 
-def delete_address(city, street, building, flat):
-    helper.delete("request", ["flat", "building", "city", "street"], [city, street, building, flat])
+def update_address(_id, item, name):
+    line = helper.update("address", "id", _id,  column_change=item, change=name)
+    print(line)
+    return line
+
+
+def delete_address(id_):
+    helper.delete("request", "creator_id", id_)

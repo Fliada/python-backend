@@ -1,16 +1,27 @@
 from dataclasses import asdict
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException
+from starlette import status
 from starlette.responses import JSONResponse
 
 from api.model.Material import MaterialCreate, MaterialUpdate
 from api.data import material
 
+from api.controller.user_controller import get_current_user
+from api.roles import ROLES
+
 material_routes = APIRouter()
 
 
 @material_routes.post('/create')
-def insert_material(materialRequest: MaterialCreate):
+def insert_material(
+        materialRequest: MaterialCreate,
+        current_user: dict = Depends(get_current_user)
+):
+
+    if not current_user.get(ROLES.STAFF.value):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can insert material")
+
     category_id = materialRequest.category_id
     name = materialRequest.name
     units = materialRequest.units
@@ -19,7 +30,15 @@ def insert_material(materialRequest: MaterialCreate):
 
 
 @material_routes.post('/update/{material_id}')
-def update_material(material_id: str, materialUpdate: MaterialUpdate):
+def update_material(
+        material_id: str, materialUpdate: MaterialUpdate,
+        current_user: dict = Depends(get_current_user)
+):
+
+    if not current_user.get(ROLES.STAFF.value):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can update material")
+
+
     if materialUpdate.name is not None:
         material.update_material(material_id, "name", materialUpdate.name)
     if materialUpdate.units is not None:
@@ -42,6 +61,12 @@ def get_category(material_id: str):
 
 
 @material_routes.delete('/{material_id}')
-def delete_material(material_id: str):
+def delete_material(
+        material_id: str,
+        current_user: dict = Depends(get_current_user)
+):
+    if not current_user.get(ROLES.STAFF.value):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can delete material")
+
     delete_material(material_id)
     return 'Удалена заявка с Id %s' % material_id

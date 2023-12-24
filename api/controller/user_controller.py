@@ -1,4 +1,7 @@
+from dataclasses import asdict
+
 from fastapi import APIRouter, Depends, HTTPException, status
+from starlette.responses import JSONResponse
 
 from api.ConfigHelper import ConfigHelper
 from api.data import user
@@ -36,6 +39,17 @@ def get_current_user(token: str = Depends(get_bearer_token)):
         return payload
     except Exception:
         raise credentials_exception
+
+
+@user_routes.get('/all')
+def get_users(
+    current_user: dict = Depends(get_current_user)
+):
+    if not current_user.get(ROLES.ADMIN.value):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can get users")
+
+    users = user.get_users()
+    return JSONResponse(content=[asdict(usr) for usr in users])
 
 
 @user_routes.get('/{user_id}')
