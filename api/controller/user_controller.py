@@ -1,26 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+
+from api.ConfigHelper import ConfigHelper
 from api.data import user
 from api.model.User import UserCreate, UserLogin
 from fastapi import HTTPException
 from api.JWTManager import JWTManager
-import configparser
+
 from fastapi.security import OAuth2PasswordBearer, HTTPBearer
-import os
+
 from api.roles import ROLES
 from datetime import datetime
 
-# Получаем абсолютный путь к текущему скрипту
-current_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-
-# Собираем путь к файлу config.ini
-
-config_file = 'config.ini'
-config_path = os.path.join(current_dir, 'configs', config_file)
-
-config = configparser.ConfigParser()
-config.read(config_path)
-
-secret_key = config['JWT']['SECRET_KEY']
+config_helper = ConfigHelper()
+secret_key = config_helper.config['JWT']['SECRET_KEY']
 
 user_routes = APIRouter()
 jwt_manager = JWTManager(secret_key)

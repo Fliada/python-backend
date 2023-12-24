@@ -86,7 +86,7 @@ def update_request(_id, item, name):
 
 
 def delete_request(_id):
-    helper.delete("request", ["id"], [_id])
+    helper.delete("request", "id", _id)
 
 
 def find_request_by_unique(_id):
@@ -128,8 +128,3 @@ def get_all_requests():
 
 def convert_requests_to_json(requests):
     return json.dumps([req.to_dict() for req in requests], indent=2)
-
-
-def toJSON(self):
-    return json.dumps(self, default=lambda o: o.__dict__,
-                      sort_keys=True, indent=4)

@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
@@ -16,7 +17,7 @@ order_routes = APIRouter()
 
 
 # РАБОТАЕТ
-@order_routes.post('/')
+@order_routes.post('')
 def insert_order(
         orderRequest: OrderCreate,
         current_user: dict = Depends(get_current_user)
@@ -67,7 +68,7 @@ def get_order(
     return JSONResponse(content=asdict(result_order))
 
 
-@order_routes.get('/')
+@order_routes.get('')
 def get_my_orders(
     current_user: dict = Depends(get_current_user)
 ):
@@ -86,12 +87,17 @@ def put_order(
 
 
 @order_routes.put('/update/{order_id}')
-def update_order(order_id: str, orderUpdate: OrderUpdate):
+def update_order(
+        order_id: str,
+        orderUpdate: OrderUpdate,
+        current_user: dict = Depends(get_current_user)
+):
+    if not current_user.get(ROLES.STAFF.value):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can update the order")
+
     order.update_request(order_id, orderUpdate.status_id)
-    if orderUpdate.user_id is not None:
-        order.update_request(order_id, "user_id", orderUpdate.user_id)
     if orderUpdate.address_id is not None:
-        order.update_request(order_id, "address_id", orderUpdate.address_id)
+        order.update_request(order_id, "address", orderUpdate.address)
     if orderUpdate.comment is not None:
         order.update_request(order_id, "comment", orderUpdate.comment)
     if orderUpdate.date_selected is not None:
@@ -101,13 +107,39 @@ def update_order(order_id: str, orderUpdate: OrderUpdate):
 
 # При повторе заявки дата тоже должна повторяться?
 @order_routes.post('/repeat/{order_id}')
-def repeat_order(order_id: str):
-    new_order = order.find_request_by_id(order_id)
-    order.create_request(new_order.user_id, new_order.address_id, new_order.comment, new_order.date_selected)
+def repeat_order(
+        order_id: str,
+        current_user: dict = Depends(get_current_user)
+):
+    try:
+        new_order = order.get_request(order_id)
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Заказа не существует')
+
+    if current_user.get("sub") != new_order.user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can't repeat someone else's order")
+
+    order.create_request(new_order.user_id, new_order.address, new_order.comment,
+                         datetime.strptime(new_order.date_selected, "%Y-%m-%d %H:%M:%S"))
+
+    _id = order.find_request_by_unique(new_order.user_id).id_
+
+    materials = request_materials.get_all_request_material(order_id)
+    for mat in materials:
+        request_materials.create_request_material(_id, mat.material_id, mat.count)
+
     return 'Repeat order %s' % order_id
 
 
 @order_routes.delete('/{order_id}')
-def delete_order(order_id: str):
+def delete_order(
+        order_id: str,
+        current_user: dict = Depends(get_current_user)
+):
+    if not current_user.get(ROLES.STAFF.value):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can delete the order")
+
     order.delete_request(order_id)
+
+    request_materials.delete_request_material(order_id)
 

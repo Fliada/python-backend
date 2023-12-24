@@ -30,7 +30,7 @@ def create_request_material(request_id, material_id, count):
 
 
 def get_all_request_material(order_id):
-    req = f"select id, name from category where request_id = '{order_id}'"
+    req = f"select * from request_materials r where request_id = '{order_id}'"
     lines = helper.any_request(req)
 
     categories = []
@@ -42,3 +42,7 @@ def get_all_request_material(order_id):
 
     print(categories)
     return categories
+
+
+def delete_request_material(order_id):
+    helper.delete("request_materials", "request_id", order_id)
