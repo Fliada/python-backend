@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Optional
 
 from pydantic import BaseModel
@@ -15,6 +16,7 @@ class MaterialUpdate(BaseModel):
     units: Optional[str] = None
 
 
+@dataclass
 class Material(BaseModel):
     name: str
     count: int

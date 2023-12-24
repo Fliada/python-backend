@@ -1,6 +1,9 @@
 import datetime
 from dataclasses import dataclass
+from typing import List
 
+from api.data import request_materials
+from api.data.request_materials import Request_material
 from api.db.DBHelper import DBHelper
 from datetime import datetime
 from api.DateHelper import format_date
@@ -14,6 +17,9 @@ helper = DBHelper()
 class Request:
     id_: int
     user_id: int
+    user_first_name: str
+    user_last_name: str
+    user_second_name: str
     staff_id: int
     address: str
     comment: str
@@ -21,8 +27,9 @@ class Request:
     date_creation: str
     date_selected: str
     date_actual: str
+    materials: List[Request_material]
 
-    def __init__(self, id_, user_id, staff_id, address, comment, status_id,
+    def __init__(self, id_, user_id, user_first_name, user_last_name, user_second_name, staff_id, address, comment, status_id,
                  date_creation, date_selected, date_actual):
         self.id_ = id_
         self.user_id = user_id
@@ -33,6 +40,12 @@ class Request:
         self.date_creation = date_creation
         self.date_selected = date_selected
         self.date_actual = date_actual
+        self.user_first_name = user_first_name
+        self.user_last_name = user_last_name
+        self.user_second_name = user_second_name
+
+    def set_materials(self, mats: List[Request_material]):
+        self.materials = mats
 
 
 def create_request(user_id: int, address: str, comment: str, date_selected: datetime):
@@ -56,24 +69,40 @@ def create_request(user_id: int, address: str, comment: str, date_selected: date
 
 
 def get_request(_id):
-    line = helper.get("request", ["id"], [_id])[0]
+    req = f"SELECT r.id, r.user_id, au.first_name, au.last_name, au.second_name, " \
+          f"r.staff_id, r.address, r.comment, r.status_id, r.date_creation, " \
+          f"r.date_selected, r.date_actual " \
+          f"FROM request r JOIN auth_user au " \
+          f"ON r.user_id = au.id " \
+          f"WHERE r.id = '{_id}'"
+
+    line = helper.any_request(req)[0]
     print(line)
-    return Request(*line)
+
+    req = Request(*line)
+    req.set_materials(request_materials.get_all_request_material(_id))
+
+    return req
 
 
 def get_user_request(user_id):
-    lines = helper.get("request", ["user_id"], [user_id])
+
+    req = f"SELECT r.id, r.user_id, au.first_name, au.last_name, au.second_name, " \
+          f"r.staff_id, r.address, r.comment, r.status_id, r.date_creation, " \
+          f"r.date_selected, r.date_actual  " \
+          f"FROM request r JOIN auth_user au " \
+          f"ON r.user_id = au.id " \
+          f"WHERE r.user_id = '{user_id}' " \
+          f"ORDER BY r.status_id"
+
+    lines = helper.any_request(req)
 
     requests = []
 
     for l in lines:
-        requests.append(
-            Request(
-                l[0], l[1], l[2],
-                l[3], l[4], l[5],
-                l[6], l[7], l[8]
-            )
-        )
+        req = Request(*l)
+        req.set_materials(request_materials.get_all_request_material(user_id))
+        requests.append(req)
 
     print(requests)
     return requests
@@ -91,36 +120,37 @@ def delete_request(_id):
 
 def find_request_by_unique(_id):
     line = helper.any_request("SELECT * FROM request r WHERE user_id = 1 ORDER BY r.date_creation DESC")[0]
-    request = Request(
-        line[0], line[1], line[2],
-        line[3], line[4], line[5],
-        line[6], line[7], line[8]
-    )
+    request = Request(*line)
 
     return request
 
 
 def find_request_by_id(_id):
     line = helper.get("request", ["id"], [_id])[0]
-    request = Request(
-        line[0], line[1], line[2],
-        line[3], line[4], line[5],
-        line[6], line[7], line[8]
-    )
+    request = Request(*line)
 
     return request
 
 
 def get_all_requests():
-    lines = helper.print_info("request")
+
+    req = f"SELECT r.id, r.user_id, au.first_name, au.last_name, au.second_name, " \
+          f"r.staff_id, r.address, r.comment, r.status_id, r.date_creation, " \
+          f"r.date_selected, r.date_actual  " \
+          f"FROM request r JOIN auth_user au " \
+          f"ON r.user_id = au.id " \
+          f"ORDER BY r.status_id"
+
+    lines = helper.any_request(req)
+
     print(lines)
 
     requests = []
 
     for l in lines:
-        requests.append(
-            Request(*l)
-        )
+        req = Request(*l)
+        req.set_materials(request_materials.get_all_request_material(l[0]))
+        requests.append(req)
 
     print(requests)
     return requests
