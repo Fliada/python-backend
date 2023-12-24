@@ -1,19 +1,23 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel
+from api.model.Material import Material
+
+
+class Forms(BaseModel):
+    material_id: int
+    count: int
 
 
 class OrderCreate(BaseModel):
-    user_id: int
-    address: str
+    forms: List[Forms]
     comment: str
+    address: str
     date_selected: datetime
 
 
 class OrderUpdate(BaseModel):
-    user_id: Optional[int] = None
     address: Optional[str] = None
     comment: Optional[str] = None
     date_selected: Optional[datetime] = None
-

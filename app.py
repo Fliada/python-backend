@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.controller import user_controller, order_controller, material_controller, address_controller, request_materials_controller, category_controller
+from api.controller import user_controller, order_controller, material_controller, address_controller, \
+    request_materials_controller, category_controller
 from api.data.user import find_user_by_email
 from api.model.User import UserLogin
 
@@ -12,29 +13,31 @@ app.include_router(user_controller.user_routes, prefix="/user", tags=["User"])
 app.include_router(order_controller.order_routes, prefix="/order", tags=["Order"])
 app.include_router(material_controller.material_routes, prefix="/material", tags=["Materials"])
 app.include_router(address_controller.address_routes, prefix="/address", tags=["Address"])
-app.include_router(request_materials_controller.request_materials_routes, prefix="/request_material", tags=["Request materials"])
+app.include_router(request_materials_controller.request_materials_routes, prefix="/request_material",
+                   tags=["Request materials"])
 app.include_router(category_controller.category_routes, prefix="/category", tags=["Category"])
 
 origins = [
-    "http://localhost/",
-    "http://localhost:8080/",  # Замените на адрес вашего локального фронтенда
+    "http://localhost",
+    "http://localhost:3000",
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=[""],
-    allow_headers=[""],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
+
 
 @app.get('/', response_class=FileResponse)
 def index():
     return 'resources/templates/index.html'
 
 
-#@app.post('/authorization')
-#def login(user: UserLogin):
+# @app.post('/authorization')
+# def login(user: UserLogin):
 #    email = user.email
 #    password = user.password
 #    print(email)
@@ -63,4 +66,5 @@ def index():
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, port=8080)

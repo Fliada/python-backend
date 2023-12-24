@@ -274,7 +274,7 @@ class DBHelper:
         query = ""
         for i in range(len(column_args) - 1):
             query += column_args[i] + " = '" + args[i] + "' AND "
-        query += column_args[len(column_args) - 1] + " = '" + args[len(column_args) - 1] + "'"
+        query += column_args[len(column_args) - 1] + " = '" + str(args[len(column_args) - 1]) + "'"
 
         new_get = f"SELECT * FROM {table_name} WHERE {query}"
         print(new_get)

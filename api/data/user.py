@@ -1,6 +1,7 @@
-import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from api.db.DBHelper import DBHelper
+from datetime import datetime
+from api.DateHelper import format_date
 
 helper = DBHelper()
 
@@ -27,21 +28,27 @@ class auth_user:
     def check_password(self, password):
         return check_password_hash(self.password, password)
 
+    def set_last_login(self, curr: datetime):
+        self.last_login = format_date(curr)
+        helper.update("auth_user", "id", self.id_, "last_login", self.last_login)
+
 
 def create_user(password, is_superuser, first_name, last_name, second_name, is_staff, is_active, email, phone_number):
     params = ["password", "last_login", "is_superuser", "first_name", "last_name",
               "second_name", "is_staff", "is_active", "date_joined", "email", "phone_number"]
 
+    now = datetime.now()
+
     args = [
         generate_password_hash(password=password),
-        datetime.datetime.now(),
+        format_date(now),
         is_superuser,
         first_name,
         last_name,
         second_name,
         is_staff,
         is_active,
-        datetime.datetime.now(),
+        format_date(now),
         email,
         phone_number
     ]
@@ -89,6 +96,10 @@ def find_user_by_id(_id):
 
 def find_user_by_email(email):
     line = helper.get("auth_user", ["email"], [email])[0]
+
+    if len(line) == 0:
+        return None
+
     user = auth_user(
         line[0], line[1], line[2], line[3],
         line[4], line[5], line[6], line[7],

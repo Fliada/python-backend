@@ -7,6 +7,7 @@ import configparser
 from fastapi.security import OAuth2PasswordBearer, HTTPBearer
 import os
 from api.roles import ROLES
+from datetime import datetime
 
 # Получаем абсолютный путь к текущему скрипту
 current_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -45,7 +46,6 @@ def get_current_user(token: str = Depends(get_bearer_token)):
         raise credentials_exception
 
 
-# Пример маршрута, доступного всем аутентифицированным пользователям
 @user_routes.get('/{user_id}')
 def get_user(user_id: str, current_user: dict = Depends(get_current_user)):
     usr = user.get_user(user_id)
@@ -96,6 +96,7 @@ def check_pass_and_create_token(email: str, password: str):
     if usr and usr.check_password(password) and usr.is_active:
         # Создание токена с использованием метода create_token из JWTManager
         token = jwt_manager.create_token(usr.id_, usr.is_superuser, usr.is_staff)
+        usr.set_last_login(datetime.now())
         return {"access_token": token, "token_type": "bearer"}
     else:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")

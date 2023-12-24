@@ -13,3 +13,10 @@ class MaterialUpdate(BaseModel):
     category_id: Optional[int] = None
     name: Optional[str] = None
     units: Optional[str] = None
+
+
+class Material(BaseModel):
+    name: str
+    count: int
+    units: str
+    category: str

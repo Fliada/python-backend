@@ -1,18 +1,33 @@
 import datetime
+from dataclasses import dataclass
 
 from api.db.DBHelper import DBHelper
+from datetime import datetime
+from api.DateHelper import format_date
+
 import json
 
 helper = DBHelper()
 
 
+@dataclass
 class Request:
-    def __init__(self, id_, user_id, staff_id, address_id, comment, status_id,
+    id_: int
+    user_id: int
+    staff_id: int
+    address: str
+    comment: str
+    status_id: int
+    date_creation: str
+    date_selected: str
+    date_actual: str
+
+    def __init__(self, id_, user_id, staff_id, address, comment, status_id,
                  date_creation, date_selected, date_actual):
         self.id_ = id_
         self.user_id = user_id
         self.staff_id = staff_id
-        self.address_id = address_id
+        self.address = address
         self.comment = comment
         self.status_id = status_id
         self.date_creation = date_creation
@@ -20,20 +35,20 @@ class Request:
         self.date_actual = date_actual
 
 
-def create_request(user_id, address_id, comment, date_selected):
-    params = ["user_id", "staff_id", "address_id", "comment", "status_id", "date_creation",
+def create_request(user_id: int, address: str, comment: str, date_selected: datetime):
+    params = ["user_id", "staff_id", "address", "comment", "status_id", "date_creation",
               "date_selected", "date_actual"]
 
-    date_creation = datetime.datetime.now()
+    date_creation = datetime.now()
 
     args = [
         user_id,
         None,
-        address_id,
+        address,
         comment,
-        0,
-        date_creation,
-        date_selected,
+        1,
+        format_date(date_creation),
+        format_date(date_selected),
         None
     ]
 
@@ -41,9 +56,27 @@ def create_request(user_id, address_id, comment, date_selected):
 
 
 def get_request(_id):
-    line = helper.get("request", ["id"], [_id])
+    line = helper.get("request", ["id"], [_id])[0]
     print(line)
-    return line
+    return Request(*line)
+
+
+def get_user_request(user_id):
+    lines = helper.get("request", ["user_id"], [user_id])
+
+    requests = []
+
+    for l in lines:
+        requests.append(
+            Request(
+                l[0], l[1], l[2],
+                l[3], l[4], l[5],
+                l[6], l[7], l[8]
+            )
+        )
+
+    print(requests)
+    return requests
 
 
 def update_request(_id, item, name):
@@ -56,8 +89,8 @@ def delete_request(_id):
     helper.delete("request", ["id"], [_id])
 
 
-def find_request_by_unique(_id, date_creation):
-    line = helper.get("request", ["user_id", "date_creation"], [_id, date_creation])
+def find_request_by_unique(_id):
+    line = helper.any_request("SELECT * FROM request r WHERE user_id = 1 ORDER BY r.date_creation DESC")[0]
     request = Request(
         line[0], line[1], line[2],
         line[3], line[4], line[5],
@@ -86,11 +119,7 @@ def get_all_requests():
 
     for l in lines:
         requests.append(
-            Request(
-                l[0], l[1], l[2],
-                l[3], l[4], l[5],
-                l[6], l[7], l[8]
-            )
+            Request(*l)
         )
 
     print(requests)
