@@ -92,7 +92,7 @@ class DBHelper:
             ["creator_id", "auth_user", "id"]
         ])
 
-        self.get_unique("address", "unique_address", ["flat", "building", "city", "street"])
+        self.get_unique("address", "unique_address", ["flat", "building", "city", "street", "creator_id"])
 
     def create_request_table(self):
         table_name = "request"

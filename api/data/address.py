@@ -106,4 +106,4 @@ def update_address(_id, item, name):
 
 
 def delete_address(id_):
-    helper.delete("request", "creator_id", id_)
+    helper.delete("address", "id", id_)

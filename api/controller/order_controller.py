@@ -43,7 +43,7 @@ def get_all_orders(
     current_user: dict = Depends(get_current_user)
 ):
 
-    if not current_user.get(ROLES.STAFF.value):
+    if current_user.get(ROLES.STAFF.value) == "False":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can get all orders")
 
     all_requests = order.get_all_requests()
@@ -56,7 +56,7 @@ def get_order(
         order_id: str,
         current_user: dict = Depends(get_current_user)
 ):
-    if not current_user.get(ROLES.STAFF.value):
+    if current_user.get(ROLES.STAFF.value) == "False":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can get the order")
 
     try:

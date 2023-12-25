@@ -23,8 +23,7 @@ def insert_address(
     building = addressRequest.building
     city = addressRequest.city
     street = addressRequest.street
-    creator_id = addressRequest.creator_id
-    address.create_address(flat, building, city, street, creator_id)
+    address.create_address(flat, building, city, street, current_user.get("sub"))
     return 'Адрес создан'
 
 
@@ -50,7 +49,7 @@ def update_address(
         addressUpdate: AddressUpdate,
         current_user: dict = Depends(get_current_user)
 ):
-    if not current_user.get(ROLES.STAFF.value):
+    if current_user.get(ROLES.STAFF.value) == "False":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can update the address")
 
     try:
@@ -72,4 +71,12 @@ def delete_address(
         id_,
         current_user: dict = Depends(get_current_user)
 ):
+    try:
+        new_address = address.find_address_by_id(id_)
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Address does not exist')
+
+    if current_user.get(ROLES.STAFF.value) == "False" and (current_user.get("sub") != new_address.creator_id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can't delete someone else's order")
+
     address.delete_address(id_)

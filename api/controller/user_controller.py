@@ -45,7 +45,7 @@ def get_current_user(token: str = Depends(get_bearer_token)):
 def get_users(
         current_user: dict = Depends(get_current_user)
 ):
-    if not current_user.get(ROLES.ADMIN.value):
+    if current_user.get(ROLES.ADMIN.value) == "False":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can get users")
 
     users = user.get_users()
@@ -55,6 +55,9 @@ def get_users(
 @user_routes.get('/{user_id}')
 def get_user(user_id: str, current_user: dict = Depends(get_current_user)):
     usr = user.get_user(user_id)
+
+    if current_user.get(ROLES.STAFF.value) == "False":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can get user")
 
     if usr:
         return {"sub": usr.id_,
@@ -69,13 +72,13 @@ def insert_user(
         userRequest: UserCreate,
         current_user: dict = Depends(get_current_user)
 ):
-    if not current_user.get(ROLES.STAFF.value):
+    if current_user.get(ROLES.STAFF.value) == "False":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can create users")
 
     is_superuser = userRequest.is_superuser
     is_staff = userRequest.is_staff
 
-    if (is_superuser or is_staff) and not current_user.get(ROLES.ADMIN.value):
+    if (is_superuser or is_staff) and current_user.get(ROLES.ADMIN.value) == "False":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can create admins and staff")
 
     # РАБОТАЕТ
@@ -117,15 +120,15 @@ def ban_user(
         user_id: str,
         current_user: dict = Depends(get_current_user)
 ):
+    if current_user.get(ROLES.STAFF.value) == "False":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can ban users")
+
     try:
         usr = user.find_user_by_id(user_id)
     except Exception:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User does not exist")
 
-    if not current_user.get(ROLES.STAFF.value):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can ban users")
-
-    if (usr.is_superuser == "True" or usr.is_staff == "True") and not current_user.get(ROLES.ADMIN.value):
+    if (usr.is_superuser == "True" or usr.is_staff == "True") and current_user.get(ROLES.ADMIN.value) == "False":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can ban admins and staff")
 
     user.ban_user(user_id)
@@ -137,15 +140,15 @@ def unban_user(
         user_id: str,
         current_user: dict = Depends(get_current_user)
 ):
+    if current_user.get(ROLES.STAFF.value) == "False":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can unban users")
+
     try:
         usr = user.find_user_by_id(user_id)
     except Exception:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User does not exist")
 
-    if not current_user.get(ROLES.STAFF.value):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can unban users")
-
-    if (usr.is_superuser == "True" or usr.is_staff == "True") and not current_user.get(ROLES.ADMIN.value):
+    if (usr.is_superuser == "True" or usr.is_staff == "True") and current_user.get(ROLES.ADMIN.value) == "False":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can unban admins and staff")
 
     user.unban_user(user_id)
@@ -157,15 +160,15 @@ def delete_user(
         user_id: str,
         current_user: dict = Depends(get_current_user)
 ):
+    if current_user.get(ROLES.STAFF.value) == "False":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can delete users")
+
     try:
         usr = user.find_user_by_id(user_id)
     except Exception:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User does not exist")
 
-    if not current_user.get(ROLES.STAFF.value):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can delete users")
-
-    if (usr.is_superuser == "True" or usr.is_staff == "True") and not current_user.get(ROLES.ADMIN.value):
+    if (usr.is_superuser == "True" or usr.is_staff == "True") and current_user.get(ROLES.ADMIN.value) == "False":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can delete admins and staff")
 
     user.delete_user(user_id)

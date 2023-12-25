@@ -8,7 +8,6 @@ class AddressCreate(BaseModel):
     building: str
     city: str
     street: str
-    creator_id: int
 
 class AddressUpdate(BaseModel):
     is_archieve: Optional[bool] = None
