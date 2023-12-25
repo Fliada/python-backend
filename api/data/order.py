@@ -119,7 +119,14 @@ def delete_request(_id):
 
 
 def find_request_by_unique(_id):
-    line = helper.any_request("SELECT * FROM request r WHERE user_id = 1 ORDER BY r.date_creation DESC")[0]
+    line = helper.any_request(f"SELECT r.id, r.user_id, au.first_name, au.last_name, au.second_name, "
+                              f"r.staff_id, r.address, r.comment, r.status_id, r.date_creation, "
+                              f"r.date_selected, r.date_actual "
+                              f"FROM request r JOIN auth_user au "
+                              f"ON r.user_id = au.id "
+                              f"WHERE r.user_id = {_id} "
+                              f"ORDER BY r.date_creation DESC ")[0]
+    print(line)
     request = Request(*line)
 
     return request
