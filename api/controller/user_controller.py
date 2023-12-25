@@ -105,7 +105,14 @@ def check_pass_and_create_token(email: str, password: str):
         # Создание токена с использованием метода create_token из JWTManager
         token = jwt_manager.create_token(usr.id_, usr.is_superuser, usr.is_staff)
         usr.set_last_login(datetime.now())
-        return {"access_token": token, "token_type": "bearer"}
+
+        return {"access_token": token, "token_type": "bearer",
+                "user_role":
+                    (ROLES.USER.name,
+                     (ROLES.STAFF.name, ROLES.ADMIN.name)
+                     [usr.is_superuser == "True"])
+                    [usr.is_staff == "True"]
+                }
     else:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
