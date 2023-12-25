@@ -49,7 +49,7 @@ class auth_user:
         helper.update("auth_user", "id", self.id_, "last_login", self.last_login)
 
 
-def create_user(password, is_superuser, first_name, last_name, second_name, is_staff, is_active, email, phone_number):
+def create_user(password, is_superuser, first_name, last_name, second_name, is_staff, email, phone_number):
     params = ["password", "last_login", "is_superuser", "first_name", "last_name",
               "second_name", "is_staff", "is_active", "date_joined", "email", "phone_number"]
 
@@ -63,7 +63,7 @@ def create_user(password, is_superuser, first_name, last_name, second_name, is_s
         last_name,
         second_name,
         is_staff,
-        is_active,
+        True,
         format_date(now),
         email,
         phone_number
@@ -105,11 +105,11 @@ def delete_user(_id):
 
 
 def ban_user(_id):
-    helper.update("auth_user", ["id"], [_id], "is_active", "false")
+    helper.update("auth_user", "id", _id, "is_active", "False")
 
 
 def unban_user(_id):
-    helper.update("auth_user", ["id"], [_id], "is_active", "true")
+    helper.update("auth_user", "id", _id, "is_active", "True")
 
 
 def find_user_by_id(_id):
@@ -129,10 +129,6 @@ def find_user_by_email(email):
     if len(line) == 0:
         return None
 
-    user = auth_user(
-        line[0], line[1], line[2], line[3],
-        line[4], line[5], line[6], line[7],
-        line[8], line[9], line[10], line[11]
-    )
+    user = auth_user(*line)
 
     return user

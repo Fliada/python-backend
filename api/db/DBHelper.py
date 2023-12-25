@@ -194,20 +194,22 @@ class DBHelper:
             self.conn.execute(update)
             print("Выполнилось")
             self.conn.commit()
+            return True
         except sqlite3.Error as err:
             print('Sql error: %s' % (' '.join(err.args)))
             self.conn.rollback()
+            return False
 
     def delete(self, table_name, column_arg, arg):
         update = f"DELETE FROM {table_name} " \
                  f"WHERE {column_arg} = '{arg}' "
         try:
-            # print(new_insert)
+            print(update)
             self.conn.execute(update)
             # print("Выполнилось")
             self.conn.commit()
         except sqlite3.Error as err:
-            # print('Sql error: %s' % (' '.join(err.args)))
+            print('Sql error: %s' % (' '.join(err.args)))
             self.conn.rollback()
 
     def insert_check(self, table_name, primary_key, primary_value, args):

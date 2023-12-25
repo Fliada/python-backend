@@ -58,13 +58,13 @@ def get_all_materials():
 
 
 def update_material(_id, item, name):
-    line = helper.update("material", ["id"], [_id], column_change=item, change=name)
-    print(line)
-    return line
+    flag = helper.update("material", "id", _id, column_change=item, change=name)
+    print(flag)
+    return flag
 
 
 def delete_material(_id):
-    helper.delete("material", ["id"], [_id])
+    helper.delete("material", "id", _id)
 
 
 def toJSON(self):

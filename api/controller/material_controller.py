@@ -38,13 +38,17 @@ def update_material(
     if not current_user.get(ROLES.STAFF.value):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can update material")
 
-
+    flag = False
     if materialUpdate.name is not None:
-        material.update_material(material_id, "name", materialUpdate.name)
+        flag = material.update_material(material_id, "name", materialUpdate.name)
     if materialUpdate.units is not None:
-        material.update_material(material_id, "units", materialUpdate.units)
+        flag = material.update_material(material_id, "units", materialUpdate.units)
     if materialUpdate.category_id is not None:
-        material.update_material(material_id, "category_id", materialUpdate.category_id)
+        flag = material.update_material(material_id, "category_id", materialUpdate.category_id)
+
+    if not flag:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="The material has not been updated")
+
     return "Материал обновлен"
 
 
@@ -68,5 +72,5 @@ def delete_material(
     if not current_user.get(ROLES.STAFF.value):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can delete material")
 
-    delete_material(material_id)
+    material.delete_material(material_id)
     return 'Удалена заявка с Id %s' % material_id

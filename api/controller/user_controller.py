@@ -84,11 +84,10 @@ def insert_user(
     first_name = userRequest.first_name
     last_name = userRequest.last_name
     second_name = userRequest.second_name
-    is_active = userRequest.is_active
     email = userRequest.email
     phone_number = userRequest.phone_number
 
-    flag = user.create_user(password, is_superuser, first_name, last_name, second_name, is_staff, is_active, email,
+    flag = user.create_user(password, is_superuser, first_name, last_name, second_name, is_staff, email,
                             phone_number)
     if flag:
         return 'Пользователь успешно создан'
@@ -99,7 +98,7 @@ def insert_user(
 def check_pass_and_create_token(email: str, password: str):
     # Ваша логика для проверки пароля
     usr = user.find_user_by_email(email)
-    if usr and usr.check_password(password) and usr.is_active:
+    if usr and usr.check_password(password) and usr.is_active == "True":
         # Создание токена с использованием метода create_token из JWTManager
         token = jwt_manager.create_token(usr.id_, usr.is_superuser, usr.is_staff)
         usr.set_last_login(datetime.now())
@@ -113,7 +112,7 @@ def get_token(userRequest: UserLogin):
     return check_pass_and_create_token(userRequest.email, userRequest.password)
 
 
-@user_routes.post('/{user_id}')
+@user_routes.post('/ban/{user_id}')
 def ban_user(
         user_id: str,
         current_user: dict = Depends(get_current_user)
@@ -125,13 +124,13 @@ def ban_user(
     return 'Забанен пользователь с Id %s' % user_id
 
 
-@user_routes.post('/{user_id}')
+@user_routes.post('/unban/{user_id}')
 def unban_user(
         user_id: str,
         current_user: dict = Depends(get_current_user)
 ):
-    if not current_user.get(ROLES.STAFF):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can unbun users")
+    if not current_user.get(ROLES.STAFF.value):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin and staff can unban users")
 
     user.unban_user(user_id)
     return 'Разбанен пользователь с Id %s' % user_id

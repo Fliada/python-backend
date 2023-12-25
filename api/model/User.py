@@ -5,7 +5,6 @@ from pydantic import BaseModel
 
 class UserCreate(BaseModel):
     is_superuser: bool
-    is_active: bool
     is_staff: bool
     first_name: str
     last_name: str
