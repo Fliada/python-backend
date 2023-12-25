@@ -58,7 +58,7 @@ def update_address(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Address does not exist')
 
     if current_user.get("sub") != new_address.creator_id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can't repeat someone else's order")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can't change someone else's address")
 
     if addressUpdate.is_archieve is not None:
         address.update_address(address_id, "is_archieve", addressUpdate.is_archieve)

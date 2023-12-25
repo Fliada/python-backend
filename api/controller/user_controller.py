@@ -64,7 +64,7 @@ def get_user(user_id: str, current_user: dict = Depends(get_current_user)):
                 "is_superuser": usr.is_superuser,
                 "is_stuff": usr.is_staff}
     else:
-        return {"message": "User not found"}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User does not found")
 
 
 @user_routes.post('/create')
